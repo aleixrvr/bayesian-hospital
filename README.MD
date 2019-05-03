@@ -10,5 +10,4 @@ You may find data description in the following links
 
 You can also find code from the mimic repository
 - https://github.com/MIT-LCP/mimic-code/
-
 - http://hdsl.uwaterloo.ca/visualization-tool
