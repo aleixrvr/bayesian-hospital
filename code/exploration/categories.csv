@@ -1,0 +1,94 @@
+ABG,ABGs
+ADT,ADT
+CSF,CSF
+IABP,IABP
+Labs,Labs
+ABG'S,ABGs
+ABG's,ABGs
+Coags,Coags
+GI/GU,GI/GU
+NICOM,NICOM
+PiCCO,PiCCO
+Urine,Urine
+VBG'S,VBGs
+VBG's,VBGs
+Alarms,Alarms
+OB-GYN,OB-GYN
+Enzymes,Enzymes
+General,General
+Impella,Impella
+ZIntake,ZIntake
+Dialysis,Dialysis
+OT Notes,OT Notes
+Chemistry,Chemistry
+Heme/Coag,Heme/Coag
+Pulmonary,Pulmonary
+Drug Level,Drug Level
+Drug level,Drug level
+Hematology,Hematology
+Intubation,Intubation
+Mixed VBGs,VBGs
+Other ABGs,ABGs
+Toxicology,Toxicology
+Treatments,Treatments
+Venous ABG,ABGs
+Blood Gases,Blood Gases
+Medications,Medications
+Quick Admit,Quick Admit
+Respiratory,Respiratory
+Bronchoscopy,Bronchoscopy
+Hemodynamics,Hemodynamics
+Neurological,Neurological
+Paracentesis,Paracentesis
+Tandem Heart,Tandem Heart
+CVL Insertion,CVL Insertion
+Pain/Sedation,Pain/Sedation
+Thoracentesis,Thoracentesis
+Cardiovascular,Cardiovascular
+Case Management,Case Management
+Family Mtg Note,Family Mtg Note
+Lumbar Puncture,Lumbar Puncture
+Adm History/FHPA,Adm History/FHPA
+Skin - Incisions,Skin
+Generic Proc Note,Generic Proc Note
+PA Line Insertion,Lines
+Skin - Assessment,Skin
+Skin - Impairment,Skin
+Mixed Venous Gases,Mixed Venous Gases
+Pastoral Care Note,Pastoral Care Note
+Scores - APACHE II,Apache
+Scores - APACHE IV,Apache
+ApacheII Parameters,Apache
+ApacheIV Parameters,Apache
+Nutrition - Enteral,Nutrition
+PICC Line Insertion,PICC Lines
+Routine Vital Signs,Routine Vital Signs
+Scores - APACHE IV (2),Apache
+Access Lines - Invasive,Lines
+Arterial Line Insertion,Lines
+Cardiovascular (Pulses),Cardiovascular
+Access Lines - Peripheral,Lines
+Restraint/Support Systems,Restraint/Support Systems
+Cardiovascular (Pacer Data),Cardiovascular
+Drains,Drains
+Output,Output
+Free Form Intake,Free Form Intake
+Research Enrollment Note,Research Enrollment Note
+Meds,Medications
+NG Feeding,NG Feeding
+Antibiotics,Antibiotics
+Fluids/Intake,Fluids
+Nutrition - Parenteral,Nutrition
+Blood Products/Colloids,Blood Products/Colloids
+Nutrition - Supplements,Nutrition
+Fluids - Other (Not In Use),Fluids
+ORGANISM,ORGANISM
+SPECIMEN,SPECIMEN
+ANTIBACTERIUM,Antibiotics
+5-Imaging,5-Imaging
+6-Cultures,6-Cultures
+4-Procedures,4-Procedures
+2-Ventilation,2-Ventilation
+7-Communication,7-Communication
+3-Significant Events,3-Significant Events
+1-Intubation/Extubation,Intubation
