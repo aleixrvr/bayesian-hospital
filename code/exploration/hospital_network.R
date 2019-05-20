@@ -4,6 +4,7 @@ library(dplyr)
 library(data.table)
 library(ggplot2)
 library(magrittr)
+library(ggdag)
 
 Sys.setenv(BIGQUERY_TEST_PROJECT="bgse-dsc")
 billing <- bq_test_project()
