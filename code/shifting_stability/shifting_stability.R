@@ -33,8 +33,8 @@ options(scipen = 999)
 # shifting stability 
 source("code/utils/stats_function.R") 
 
-
 # CONNECT TO BigQuery ====
+
 Sys.setenv(BIGQUERY_TEST_PROJECT="bgse-dsc")
 billing <- bq_test_project()
 con <- dbConnect(
@@ -51,18 +51,32 @@ dbListTables(con)
 
 # SQL QUERY ====
 
-# sql <- paste0("SELECT ", 
-#               "CHARTTIME, ",
-#               "DATETIME_ADD(CHARTTIME, INTERVAL 1001 DAY) AS CHARTTIME_SHIFT_1, ",
-#               "DATETIME_ADD(CHARTTIME, INTERVAL 2037 DAY) AS CHARTTIME_SHIFT_2, ",
-#               "DATETIME_ADD(CHARTTIME, INTERVAL 1687 DAY) AS CHARTTIME_SHIFT_3, ",
-#               "DATETIME_ADD(CHARTTIME, INTERVAL 2716 DAY) AS CHARTTIME_SHIFT_4, ",
-#               "DATETIME_ADD(CHARTTIME, INTERVAL 2989 DAY) AS CHARTTIME_SHIFT_5 ",
-#               "FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS` ")
-# time_shifts <- dbGetQuery(con, sql)
+# see `shifting_stability.sql`
+
+# TIME SHIFT GENERATION ====
+
+sql <- paste0("SELECT DISTINCT(ICUSTAY_ID) AS ICUSTAY_ID ",
+"FROM MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS AS CHART")
+
+time_shifts <- dbGetQuery(con, sql)
+
+input = 1000:3000
+multiple_of_7 = (input %% 7) == 0
+input = input[multiple_of_7]
+
+time_shifts <- time_shifts %>% 
+  mutate(SHIFT_1 = sample(input, size = nrow(time_shifts), replace = TRUE),
+         SHIFT_2 = sample(input, size = nrow(time_shifts), replace = TRUE),
+         SHIFT_3 = sample(input, size = nrow(time_shifts), replace = TRUE),
+         SHIFT_4 = sample(input, size = nrow(time_shifts), replace = TRUE),
+         SHIFT_5 = sample(input, size = nrow(time_shifts), replace = TRUE))
+
+time_shifts
+
+# write table to BigQuery
+#dbWriteTable(con, name = "TIME_SHIFT", time_shifts, row.names = TRUE, overwrite = TRUE)
 
 # TIME SHIFT MIN AND MAX ====
-
 sql_max <- paste0("SELECT MAX(CHARTTIME) AS MAX_CHARTTIME, ",
                   "MAX(CHARTTIME_SHIFT_1) AS MAX_CHARTTIME_SHIFT_1, ",
                   "MAX(CHARTTIME_SHIFT_2) AS MAX_CHARTTIME_SHIFT_2, ",
@@ -83,17 +97,18 @@ time_shifts_min <- dbGetQuery(con, sql_min)
 
 # Check Shifts 
 
-wday(lubridate::as_datetime(time_shifts_min[[1]])) 
-wday(lubridate::as_datetime(time_shifts_min[[2]]))
-wday(lubridate::as_datetime(time_shifts_min[[3]])) 
-wday(lubridate::as_datetime(time_shifts_min[[4]])) 
-wday(lubridate::as_datetime(time_shifts_min[[5]]))
-wday(lubridate::as_datetime(time_shifts_min[[6]]))
+sql_ts_check <- paste0("SELECT CHARTTIME, CHARTTIME_SHIFT_1,  CHARTTIME_SHIFT_2,
+                    CHARTTIME_SHIFT_3, CHARTTIME_SHIFT_4, CHARTTIME_SHIFT_5 ",
+"FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS` ",
+"WHERE ICUSTAY_ID = 209603")
+ts_check <- dbGetQuery(con, sql_ts_check)
 
-wday(lubridate::as_datetime(time_shifts_max[[1]])) 
-wday(lubridate::as_datetime(time_shifts_max[[2]]))
-wday(lubridate::as_datetime(time_shifts_max[[3]])) 
-wday(lubridate::as_datetime(time_shifts_max[[4]])) 
-wday(lubridate::as_datetime(time_shifts_max[[5]]))
-wday(lubridate::as_datetime(time_shifts_max[[6]]))
+CHARTTIME <- wday(lubridate::as_datetime(ts_check[[1]])) 
+CHARTTIME_SHIFT_1 <- wday(lubridate::as_datetime(ts_check[[2]]))
+CHARTTIME_SHIFT_2<- wday(lubridate::as_datetime(ts_check[[3]]))
+CHARTTIME_SHIFT_3<- wday(lubridate::as_datetime(ts_check[[4]]))
+CHARTTIME_SHIFT_4 <- wday(lubridate::as_datetime(ts_check[[5]]))
+CHARTTIME_SHIFT_5 <- wday(lubridate::as_datetime(ts_check[[6]]))
+
+identical(CHARTTIME, CHARTTIME_SHIFT_1, CHARTTIME_SHIFT_2, CHARTTIME_SHIFT_3, CHARTTIME_SHIFT_4, CHARTTIME_SHIFT_5)
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
