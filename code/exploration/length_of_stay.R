@@ -29,7 +29,7 @@ con <- dbConnect(
 )
 dbListTables(con)
 
-
+# write SQL BigQuery 
 sql_los <- paste0("SELECT LOS FROM MIMIC3_V1_4.ICUSTAYS WHERE LOS >= 0 AND LOS <=20")
 
 # assign ICU length of stay to variable
