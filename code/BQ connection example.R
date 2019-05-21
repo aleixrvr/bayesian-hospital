@@ -2,7 +2,7 @@ library("bigrquery")
 library(DBI)
 library(dplyr)
 library(data.table)
-
+ 
 Sys.setenv(BIGQUERY_TEST_PROJECT="bgse-dsc")
 billing <- bq_test_project()
 
