@@ -20,4 +20,9 @@ function(input, output) {
   output$departs <- renderTable({
     fread('../../departs.csv')
   })
+  
+  output$iculos <- renderPlot({
+    plot_network_call()$icu_los
+  })
 }
+

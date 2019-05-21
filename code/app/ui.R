@@ -12,9 +12,10 @@ dashboardPage(
     tabItems(
       # First tab content
       tabItem(tabName = "time_stats",
-              h2("Hospital Stats")
-              ),
-      
+              fluidRow(
+              h2("Hospital Stats"),
+              box(plotOutput("iculos"))
+              )),
       # Second tab content
       tabItem(tabName = "hospital_graph",
               fluidRow(

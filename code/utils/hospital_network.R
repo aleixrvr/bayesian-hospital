@@ -20,6 +20,9 @@ get_transfers <- function(){
   as.data.table(tbl(con, "TRANSFERS"))
 }
 
+get_iculos <- function(){
+  iculos = dbGetQuery(con, "SELECT LOS FROM MIMIC3_V1_4.ICUSTAYS WHERE LOS >= 0 AND LOS <=20")
+}
 
 plot_network <- function(){
   transfers <- get_transfers()  
@@ -57,7 +60,6 @@ plot_network <- function(){
           panel.border = element_blank()) ->
     trans_mat
   
-  
   ### Hospital network
   ord_dept <- function(prev, curr){
     c(prev %>% as.character, curr %>% as.character) %>% 
@@ -80,6 +82,12 @@ plot_network <- function(){
     ggdag ->
     hospt_dag
   
-  return(list(trans_mat=trans_mat, hospt_dag=hospt_dag))
+  # plot histogram of length of stay in the ICU
+   iculos_data <- get_iculos()
+   qplot(iculos_data$LOS, geom="histogram", binwidth = 1, main = "Length of stay in the ICU", 
+        xlab = "Length of stay, days", fill=I("#9ebcda"), col=I("#FFFFFF")) -> icu_los
+  
+  return(list(trans_mat=trans_mat, hospt_dag=hospt_dag, icu_los=icu_los))
 }
+
 
