@@ -30,7 +30,6 @@ options(scipen = 999)
 # FUNCTIONS ====
 
 # source the function from `stats_function.R` script in order to test the time 
-# shifting stability 
 source("code/utils/stats_function.R") 
 
 # CONNECT TO BigQuery ====
