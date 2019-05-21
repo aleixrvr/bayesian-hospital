@@ -40,10 +40,21 @@ plot_network <- function(){
   
   trans_summary[, PREV_CAREUNIT := factor(PREV_CAREUNIT, levels = careunits)]
   trans_summary[, CURR_CAREUNIT := factor(CURR_CAREUNIT, levels = careunits)]
-  
+
   trans_summary %>% 
     ggplot(aes(PREV_CAREUNIT, CURR_CAREUNIT)) +
-    geom_tile(aes(fill = prop), color = "white") ->
+    geom_tile(aes(fill = prop), color = "white") +
+    scale_fill_gradient(low = "#e3ebed",
+                        high = "#8aa6ad", 
+                        name="PROBABILITY") +
+    xlab("PREVIOUS CARE UNIT") +
+    ylab("CURRENT CARE UNIT") +
+    scale_x_discrete(limits = rev(levels(trans_summary$PREV_CAREUNIT))) +
+    coord_flip() +
+    theme_light() +
+    theme(legend.position = "right", legend.direction = "vertical",
+          panel.grid.major = element_blank(),
+          panel.border = element_blank()) ->
     trans_mat
   
   
