@@ -26,11 +26,18 @@ for(i in times){
 times <- c("CHARTTIME", "CHARTTIME_SHIFT_1", "CHARTTIME_SHIFT_2", "CHARTTIME_SHIFT_3", "CHARTTIME_SHIFT_4", "CHARTTIME_SHIFT_5")
 measures <- c("avg_staff", "avg_pat", "avg_treat")
 for(i in times){
-    png(file = paste0("code/exploration/Plots/", i,"_Staff.png"), width = 6, height = 4, units = 'in', res = 300)
-    queries_list[[i]] %>% 
-        ggplot(aes(newdate,avg_staff, group = CURR_CAREUNIT)) +  geom_line() + 
+    ggplot(queries_list[[i]], aes(newdate,avg_staff, group = CURR_CAREUNIT)) +  geom_line() + 
         labs(x="Quarterly Aggregation", y= "Number of Staff", title=paste("Distribution of Staff over time -", tolower(i))) + 
-        facet_grid(CURR_CAREUNIT~.)  + theme(axis.text.x = element_blank(), 
-                                             axis.ticks = element_blank())
-    dev.off()
+        facet_grid(CURR_CAREUNIT~.)  + theme(axis.text.x = element_blank(),axis.ticks = element_blank())
+    ggsave(paste0("code/exploration/Plots/Staff_", i,".png"), plot = last_plot(), device = png(),width = 6, height = 4, units = 'in')
+    
+    ggplot(queries_list[[i]], aes(newdate,avg_pat, group = CURR_CAREUNIT)) +  geom_line() + 
+        labs(x="Quarterly Aggregation", y= "Number of Patients", title=paste("Distribution of Patients over time -", tolower(i))) + 
+        facet_grid(CURR_CAREUNIT~.)  + theme(axis.text.x = element_blank(),axis.ticks = element_blank())
+    ggsave(paste0("code/exploration/Plots/Patients_", i,".png"), plot = last_plot(), device = png(),width = 6, height = 4, units = 'in')
+    
+    ggplot(queries_list[[i]], aes(newdate,avg_treat, group = CURR_CAREUNIT)) +  geom_line() + 
+        labs(x="Quarterly Aggregation", y= "Number of Treatments", title=paste("Distribution of Treatments over time -", tolower(i))) + 
+        facet_grid(CURR_CAREUNIT~.)  + theme(axis.text.x = element_blank(),axis.ticks = element_blank())
+    ggsave(paste0("code/exploration/Plots/Treatments_", i,".png"), plot = last_plot(), device = png(),width = 6, height = 4, units = 'in')
 }
