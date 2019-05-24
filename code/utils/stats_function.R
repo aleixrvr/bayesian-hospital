@@ -28,9 +28,11 @@ calc_stats <- function(window_start, window_end, time_shift = "CHARTTIME",
     }
     # aggregation levels
     unit_or_category <- ifelse(unit_aggregation, "CURR_CAREUNIT", "CATEGORY_GROUP")
-    if(time_aggregation =="TOTAL"){ 
-        time_aggs <- "" 
-        times <- ""
+    if(length(time_aggregation) == 1){
+        if(time_aggregation =="TOTAL"){ 
+            time_aggs <- "" 
+            times <- ""
+        }
     }
     else{
         time_aggs <- paste(",", paste0(time_aggregation, collapse = ", "))
