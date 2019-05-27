@@ -6,7 +6,7 @@
 
 # SUMMARY: 
 # INITIALISE ====
- rm(list=ls())
+ #rm(list=ls())
 
 #> Libraries ----
 library(bigrquery)
@@ -76,4 +76,4 @@ time_collapse <- time_collapse %>%
 #glimpse(time_collapse)
 
 # write table to BigQuery
-dbWriteTable(con, name = "ICUSTAYS_COLLAPSED", time_collapse, row.names = TRUE, overwrite = TRUE)
+#dbWriteTable(con, name = "ICUSTAYS_COLLAPSED", time_collapse, row.names = TRUE, overwrite = TRUE)
