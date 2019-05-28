@@ -69,11 +69,11 @@ INTIME_collapsed_date <- ymd_hms(INTIME_collapsed_date, truncated = 3) + lubrida
 
 identical(lubridate::wday(INTIME_collapsed_date), lubridate::wday(time_collapse$INTIME))
 
-time_collapse <- time_collapse %>% 
+time_collapsed <- time_collapse %>% 
   mutate(INTIME_COLLAPSED = INTIME_collapsed_date,
          OUTIME_COLLAPSED  = INTIME_COLLAPSED + lubridate::as.difftime(time_collapse$LOS, units = "days"))
 
-#glimpse(time_collapse)
+#glimpse(time_collapsed)
 
 # write table to BigQuery
 #dbWriteTable(con, name = "ICUSTAYS_COLLAPSED", time_collapse, row.names = TRUE, overwrite = TRUE)
