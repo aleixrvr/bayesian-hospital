@@ -46,7 +46,7 @@ dashboardPage(
                     #" ", br(), 
                     dateRangeInput(inputId = "time_window", 
                                    label = "Select the time window for the series", 
-                                   start = "2100-06-07", end = "2209-08-07", 
+                                   start = "1990-01-01", end = "2210-01-01", 
                                    startview = "decade", weekstart = 1), 
                     submitButton("Update View", icon("refresh"))
                 )
