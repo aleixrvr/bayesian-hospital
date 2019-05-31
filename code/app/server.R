@@ -1,5 +1,6 @@
 # source('../utils/stats_function.R')
 source('../utils/hospital_network.R')
+source('../utils/time_series.R') 
 library(data.table)
 
 function(input, output) {
@@ -23,6 +24,15 @@ function(input, output) {
   
   output$iculos <- renderPlot({
     plot_network_call()$icu_los
+  })
+  
+  output$timeseries <- renderPlot({
+    aggregation <- reactive({ input$aggregation })
+    time_window <- reactive({ input$time_window })
+    shift <- reactive({ input$shift })
+    objective <- reactive({ input$objective })
+    plot_timeseries(objective(),shift(),time_window(),aggregation())
+    
   })
 }
 

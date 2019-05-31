@@ -4,14 +4,14 @@ min_date <- "2100-06-07"
 max_date <- "2209-08-07"
 
 ## How much staff is present /treatments given each day over the years on average
-dist_day <- calc_stats(min_date, max_date, time_aggregation = c("DATE"))
-dist_day[, .(avg_staff = mean(staff)), by=CURR_CAREUNIT]
-ggplot(dist_day, aes(CURR_CAREUNIT,staff)) +  geom_boxplot() + theme_bw() + labs(x="Care Unit", y= "Number of Staff", title="Distribution of Staff")
-ggplot(dist_day, aes(CURR_CAREUNIT,patients)) +  geom_boxplot() + theme_bw() + labs(x="Care Unit", y= "Number of Patients", title="Distribution of Patients")
-ggplot(dist_day, aes(CURR_CAREUNIT,treatments)) +  geom_boxplot() + theme_bw() + labs(x="Care Unit", y= "Number of Treatments", title="Distribution of Treatments")
+#dist_day <- calc_stats(min_date, max_date, time_aggregation = c("DATE"))
+#dist_day[, .(avg_staff = mean(staff)), by=CURR_CAREUNIT]
+#ggplot(dist_day, aes(CURR_CAREUNIT,staff)) +  geom_boxplot() + theme_bw() + labs(x="Care Unit", y= "Number of Staff", title="Distribution of Staff")
+#ggplot(dist_day, aes(CURR_CAREUNIT,patients)) +  geom_boxplot() + theme_bw() + labs(x="Care Unit", y= "Number of Patients", title="Distribution of Patients")
+#ggplot(dist_day, aes(CURR_CAREUNIT,treatments)) +  geom_boxplot() + theme_bw() + labs(x="Care Unit", y= "Number of Treatments", title="Distribution of Treatments")
 
 ## Is the length of stay dependent on the admission month
-dist_mwd <- calc_stats(min_date, max_date, time_aggregation = c("ISOYEAR","MONTH"))
+#dist_mwd <- calc_stats(min_date, max_date, time_aggregation = c("ISOYEAR","MONTH"))
 #dist_mwd[, newdate := paste0(ISOYEAR,MONTH)] %>%  ggplot(aes(newdate, avg_los)) + geom_line() + facet_grid(CURR_CAREUNIT~.)
 
 ## Does time-shifting have an influence on distribution of staff/ patients over time
@@ -24,7 +24,7 @@ for(i in times){
 }
 
 times <- c("CHARTTIME", "CHARTTIME_SHIFT_1", "CHARTTIME_SHIFT_2", "CHARTTIME_SHIFT_3", "CHARTTIME_SHIFT_4", "CHARTTIME_SHIFT_5")
-measures <- c("avg_staff", "avg_pat", "avg_treat")
+measures <- c("avg_staff", "avg_pat", "avg_treat","avg_los")
 for(i in times){
     ggplot(queries_list[[i]], aes(newdate,avg_staff, group = CURR_CAREUNIT)) +  geom_line() + 
         labs(x="Quarterly Aggregation", y= "Number of Staff", title=paste("Distribution of Staff over time -", tolower(i))) + 

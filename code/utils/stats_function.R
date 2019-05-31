@@ -18,7 +18,8 @@ dbListTables(con)
 calc_stats <- function(window_start, window_end, time_shift = "CHARTTIME", 
                        time_aggregation = "TOTAL", unit_aggregation = T){
     # check input
-    allowed_shifts <- c("CHARTTIME", "CHARTTIME_SHIFT_1", "CHARTTIME_SHIFT_2", "CHARTTIME_SHIFT_3","CHARTTIME_SHIFT_4", "CHARTTIME_SHIFT_5")
+    allowed_shifts <- c("CHARTTIME", "CHARTTIME_SHIFT_1", "CHARTTIME_SHIFT_2", "CHARTTIME_SHIFT_3","CHARTTIME_SHIFT_4", "CHARTTIME_SHIFT_5",
+                        "INTIME_COLLAPSED","INTIME_COLLAPSED_SHIFT_1","INTIME_COLLAPSED_SHIFT_2","INTIME_COLLAPSED_SHIFT_3","INTIME_COLLAPSED_SHIFT_4","INTIME_COLLAPSED_SHIFT_5")
     if (! time_shift %in% allowed_shifts){
         stop("Chart Time must be of the following: CHARTTIME, CHARTTIME_SHIFT_1, CHARTTIME_SHIFT_2, CHARTTIME_SHIFT_3, CHARTTIME_SHIFT_4, CHARTTIME_SHIFT_5")
     }
@@ -40,7 +41,7 @@ calc_stats <- function(window_start, window_end, time_shift = "CHARTTIME",
     }
     # building the query
     sql <- paste("SELECT", "DISTINCT", unit_or_category, ",", times, "COUNT(DISTINCT ITEMID) AS treatments,", "COUNT(DISTINCT SUBJECT_ID) AS patients,", "COUNT(DISTINCT CGID) AS staff, AVG(LOS) AS avg_los", 
-                 "FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS`", 
+                 "FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED`", 
                  "WHERE DATE(", time_shift, ") >=", paste0("'", window_start, "'"), "AND DATE(", time_shift, ") <=", paste0("'" , window_end, "'"),
                  "GROUP BY ", unit_or_category, time_aggs,
                  "ORDER BY ", unit_or_category, time_aggs, ";")
