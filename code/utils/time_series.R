@@ -23,7 +23,7 @@ plot_timeseries <- function(objective, shift, time_window, aggregation){
     plot <- ggplot(dist_shift, aes(newdate, get(objective), group = CURR_CAREUNIT)) + 
         geom_line(color=I("#9ebcda"),size=.4) + 
         facet_grid(CURR_CAREUNIT~.) + 
-        labs(x=element_blank(), y=element_blank()) + 
+        labs(x=element_blank(), y=element_blank()) +
         theme(#axis.text.x = element_blank(), 
             #axis.ticks.y = element_blank(),
             strip.text.y = element_text(size=10, face="bold"),

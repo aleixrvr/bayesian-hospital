@@ -18,6 +18,15 @@ function(input, output) {
     plot_network_call()$hospt_dag
   })
   
+  output$los_correlation <- renderPlot({
+    plot_network_call()$trans_los
+  })
+  
+  output$week_los <- renderPlot({
+    plot_network_call()$week_los
+  })
+  
+  
   output$departs <- renderTable({
     fread('../../departs.csv')
   })

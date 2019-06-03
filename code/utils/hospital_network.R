@@ -43,7 +43,7 @@ plot_network <- function(){
   
   trans_summary[, PREV_CAREUNIT := factor(PREV_CAREUNIT, levels = careunits)]
   trans_summary[, CURR_CAREUNIT := factor(CURR_CAREUNIT, levels = careunits)]
-
+  
   trans_summary %>% 
     ggplot(aes(PREV_CAREUNIT, CURR_CAREUNIT)) +
     geom_tile(aes(fill = prop), color = "white") +
@@ -83,11 +83,59 @@ plot_network <- function(){
     hospt_dag
   
   # plot histogram of length of stay in the ICU
-   iculos_data <- get_iculos()
-   qplot(iculos_data$LOS, geom="histogram", binwidth = 1, main = "Length of stay in the ICU", 
+  iculos_data <- get_iculos()
+  qplot(iculos_data$LOS, geom="histogram", binwidth = 1, main = "Length of stay in the ICU", 
         xlab = "Length of stay, days", fill=I("#9ebcda"), col=I("#FFFFFF")) -> icu_los
   
-  return(list(trans_mat=trans_mat, hospt_dag=hospt_dag, icu_los=icu_los))
+  
+  # LOS plot
+  transfers %>%    
+    .[is.na(CURR_CAREUNIT), CURR_CAREUNIT := 'OUT'] %>% 
+    .[is.na(PREV_CAREUNIT), PREV_CAREUNIT := 'OUT'] %>% 
+    .[(PREV_CAREUNIT != 'OUT') | (CURR_CAREUNIT != 'OUT')] %>% 
+    .[!is.na(ICUSTAY_ID)] ->
+    transfers_mod
+  
+  setorder(transfers_mod, ICUSTAY_ID, INTIME)
+  transfers_mod %>% 
+    .[, NEXT_CAREUNIT := shift(CURR_CAREUNIT, type="lead"), ICUSTAY_ID] %>% 
+    .[, NEXT_LOS := shift(LOS, type="lead"), ICUSTAY_ID] 
+  
+  transfers_mod %>% 
+    .[CURR_CAREUNIT != NEXT_CAREUNIT] %>% 
+    ggplot(aes(NEXT_LOS, LOS)) +
+    geom_point() +
+    facet_grid(NEXT_CAREUNIT~CURR_CAREUNIT) ->
+    trans_los
+  
+  # WEEK DATA
+  
+  transfers %>% 
+    .[, time := ymd_hms(INTIME)] %>% 
+    .[, hour := hour(time)] %>% 
+    .[, wday := wday(time, label = TRUE)] ->
+    week_trans
+  
+  ess_max_los <- as.numeric(week_trans[, quantile(na.omit(LOS), prob =.95)])
+  
+  week_trans %>% 
+    .[, .(LOS = median(na.omit(LOS))), .(wday, hour)] %>% 
+    na.omit %>% 
+    ggplot(aes(hour, LOS))+
+    geom_line() +
+    facet_grid(wday~.) ->
+    week_los
+  
+  return(list(
+    trans_mat=trans_mat, 
+    hospt_dag=hospt_dag, 
+    icu_los=icu_los, 
+    trans_los=trans_los,
+    week_los=week_los))
+}
+
+plot_los <- function(){
+  
 }
 
 
