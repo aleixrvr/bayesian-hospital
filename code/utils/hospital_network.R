@@ -60,6 +60,33 @@ plot_network <- function(){
           panel.border = element_blank()) ->
     trans_mat
   
+  ### Transition Rate
+  
+  total_years <- 12
+  transfers[, .(n = .N/total_years), .(PREV_CAREUNIT, CURR_CAREUNIT)] %>% 
+    .[(PREV_CAREUNIT != 'OUT') | (CURR_CAREUNIT != 'OUT')] %>% 
+    .[PREV_CAREUNIT != CURR_CAREUNIT] ->
+    trans_summary_rate
+  
+  trans_summary_rate[, PREV_CAREUNIT := factor(PREV_CAREUNIT, levels = careunits)]
+  trans_summary_rate[, CURR_CAREUNIT := factor(CURR_CAREUNIT, levels = careunits)]
+  
+  trans_summary_rate %>% 
+    ggplot(aes(PREV_CAREUNIT, CURR_CAREUNIT)) +
+    geom_tile(aes(fill = n), color = "white") +
+    scale_fill_gradient(low = "#e3ebed",
+                        high = "#8aa6ad", 
+                        name="NUMBER OF TRANSITIONS") +
+    xlab("PREVIOUS CARE UNIT") +
+    ylab("CURRENT CARE UNIT") +
+    scale_x_discrete(limits = rev(levels(trans_summary$PREV_CAREUNIT))) +
+    coord_flip() +
+    theme_light() +
+    theme(legend.position = "right", legend.direction = "vertical",
+          panel.grid.major = element_blank(),
+          panel.border = element_blank()) ->
+    trans_rate_mat
+  
   ### Hospital network
   ord_dept <- function(prev, curr){
     c(prev %>% as.character, curr %>% as.character) %>% 
@@ -131,7 +158,8 @@ plot_network <- function(){
     hospt_dag=hospt_dag, 
     icu_los=icu_los, 
     trans_los=trans_los,
-    week_los=week_los))
+    week_los=week_los,
+    trans_rate_mat=trans_rate_mat))
 }
 
 plot_los <- function(){

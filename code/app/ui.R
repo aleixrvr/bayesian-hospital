@@ -70,6 +70,10 @@ dashboardPage(
                 box(tableOutput("departs"))
               ),
               fluidRow(
+                h2("Transition Rate Matrix (per year)"),
+                box(plotOutput("trans_rate_matrix"))
+              ),
+              fluidRow(
                 h2("Hospital Graph"),
                 box(plotOutput("dag"))
               )

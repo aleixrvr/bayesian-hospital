@@ -26,6 +26,11 @@ function(input, output) {
     plot_network_call()$week_los
   })
   
+  output$trans_rate_matrix <- renderPlot({
+    plot_network_call()$trans_rate_mat
+  })
+  
+  
   
   output$departs <- renderTable({
     fread('../../departs.csv')
