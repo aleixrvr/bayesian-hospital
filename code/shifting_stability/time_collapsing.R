@@ -1,20 +1,20 @@
 # METADATA ====
 # Description: Time collapsing 
 # Created: 2019-05-27 (Reid Falconer)
-# Updated: 2019-05-27 (Reid Falconer)
+# Updated: 2019-06-03 (Reid Falconer)
 # Reviewed: 
 
 # SUMMARY: 
 # INITIALISE ====
- #rm(list=ls())
+#rm(list=ls())
 
 #> Libraries ----
 library(bigrquery)
 library(DBI)
 library(data.table)
-library(tidyverse)
 library(hms)
 library(lubridate)
+library(tidyverse)
 
 #> Set options ----
 
@@ -50,30 +50,74 @@ dbListTables(con)
 
 sql <- paste0("SELECT * ",
               "FROM MIMIC3_V1_4.ICUSTAYS AS ICUSTAYS")
+
 time_collapse <- dbGetQuery(con, sql)
 
-INTIME_a <- time_collapse$INTIME - min(time_collapse$INTIME)
-INTIME_a <- lubridate::as.period(INTIME_a, unit = "days")
-INTIME_b <- max(time_collapse$INTIME) - min(time_collapse$INTIME)
-INTIME_b <- lubridate::as.period(INTIME_b, unit = "days")
-INTIME_new <- (INTIME_a/INTIME_b)*12*364
+collapse_times <- function(source = "metavision") {
+  input = 1000:3000
+  multiple_of_7 = (input %% 7) == 0
+  input = input[multiple_of_7]
+  df <- time_collapse
+  df <- time_collapse %>% 
+    mutate(SHIFT_1 = sample(input, size = nrow(df), replace = TRUE),
+           SHIFT_2 = sample(input, size = nrow(df), replace = TRUE),
+           SHIFT_3 = sample(input, size = nrow(df), replace = TRUE),
+           SHIFT_4 = sample(input, size = nrow(df), replace = TRUE),
+           SHIFT_5 = sample(input, size = nrow(df), replace = TRUE),
+           INTIME_SHIFT_1 = INTIME + days(SHIFT_1),
+           INTIME_SHIFT_2 = INTIME + days(SHIFT_2),
+           INTIME_SHIFT_3 = INTIME + days(SHIFT_3),
+           INTIME_SHIFT_4 = INTIME + days(SHIFT_4),
+           INTIME_SHIFT_5 = INTIME + days(SHIFT_5))
+  
+  if(source == "carevue") {
+    years <- 7
+    start_date = "2001-01-01"
+    df <- df %>% 
+      filter(DBSOURCE == source)
+  } else if ( source == "metavision") {
+    years <- 5
+    start_date = "2008-01-01"
+    df <- df %>% 
+      filter(DBSOURCE == source  | DBSOURCE == "both")
+  } else {
+    years <- 12
+    start_date = "2001-01-01"
+  }
+  df_collapsed <- df
+  df_time <-df %>% 
+    select(INTIME, INTIME_SHIFT_1, INTIME_SHIFT_2, INTIME_SHIFT_3, INTIME_SHIFT_4, INTIME_SHIFT_5)
+  for (time in colnames(df_time)) {
+  INTIME_a <- df[[time]] - min(df[[time]])
+  INTIME_a <- lubridate::as.period(INTIME_a, unit = "days")
+  INTIME_b <- max(df[[time]]) - min(df[[time]])
+  INTIME_b <- lubridate::as.period(INTIME_b, unit = "days")
+  INTIME_new <- (INTIME_a/INTIME_b)*years*364
+  
+  INTIME_dates <- lubridate::as_date(start_date) + INTIME_new
+  INTIME_COLLAPSED_date <- lubridate::floor_date(INTIME_dates, 
+                                                 unit = "weeks") + (lubridate::wday(df[[time]]) - 1)
+  time_of_day <- hms::hms(lubridate::second(df[[time]]),
+                     lubridate::minute(df[[time]]),
+                     lubridate::hour(df[[time]]))
+  INTIME_COLLAPSED_date <- ymd_hms(INTIME_COLLAPSED_date, truncated = 3, tz = "Etc/GMT+5") + lubridate::hms(time_of_day)
+  print(identical(lubridate::wday(INTIME_COLLAPSED_date), lubridate::wday(df$INTIME)))
+  intime_var_name <- paste0(time,"_COLLAPSED")
+  outtime_var_name <- paste0("OUTTIME",substring(time, 7),"_COLLAPSED")
+  df_collapsed[[intime_var_name]] <- with(df_collapsed, INTIME_COLLAPSED_date)
+  df_collapsed[[outtime_var_name]] <- with(df_collapsed, INTIME_COLLAPSED_date + lubridate::as.difftime(df$LOS, units = "days"))
+  }
+  return(df_collapsed)
+}
+  
+carvue <- collapse_times(source = "carevue")
+metavision <- collapse_times(source = "metavision")
+#all <- collapse_times(source = "all")
+# nrow(carvue) + nrow(metavision)
+# nrow(all)
 
-INTIME_dates <- lubridate::as_date("2001-01-01") + INTIME_new
-INTIME_collapsed_date <- lubridate::floor_date(INTIME_dates, unit = "weeks") + (lubridate::wday(time_collapse$INTIME) - 1)
-
-time_of_day <- hms::hms(lubridate::second(time_collapse$INTIME),
-                     lubridate::minute(time_collapse$INTIME),
-                     lubridate::hour(time_collapse$INTIME))
-
-INTIME_collapsed_date <- ymd_hms(INTIME_collapsed_date, truncated = 3) + lubridate::hms(time_of_day)
-
-identical(lubridate::wday(INTIME_collapsed_date), lubridate::wday(time_collapse$INTIME))
-
-time_collapsed <- time_collapse %>% 
-  mutate(INTIME_COLLAPSED = INTIME_collapsed_date,
-         OUTIME_COLLAPSED  = INTIME_COLLAPSED + lubridate::as.difftime(time_collapse$LOS, units = "days"))
-
-#glimpse(time_collapsed)
+df_collapsed <- rbind(carvue, metavision)
+#glimpse(df_collapsed)
 
 # write table to BigQuery
-#dbWriteTable(con, name = "ICUSTAYS_COLLAPSED", time_collapse, row.names = TRUE, overwrite = TRUE)
+#dbWriteTable(con, name = "ICUSTAYS_COLLAPSED", df_collapsed, row.names = TRUE, overwrite = TRUE)
