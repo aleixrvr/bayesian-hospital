@@ -16,8 +16,8 @@ plot_timeseries <- function(objective, shift, time_window, aggregation){
     dist_shift <- dist_shift[,.(avg_staff = mean(staff), avg_treat = mean(treatments), avg_pat = mean(patients), avg_los = mean(avg_los)), by=list(CURR_CAREUNIT,newdate)]
     
     durations <- (time_window[2] - time_window[1]) / 6 
-    x_labels <- c(time_window[1] + durations, time_window[1] + 2 * durations, time_window[1] + 3 * durations, time_window[1] + 4 * durations)
-    x_breaks <- dist_shift[seq(0,length(dist_shift$newdate), (length(dist_shift$newdate) /6 )),"newdate"][2:5]
+    x_labels <- c(time_window[1] + durations, time_window[1] + 2 * durations, time_window[1] + 3 * durations, time_window[1] + 4 * durations, time_window[1] + 5 * durations, time_window[1] + 6 * durations)
+    x_breaks <- unname(round(quantile(as.numeric(dist_shift$newdate), probs = seq(0, 1, 0.2))))
     y_breaks <- unname(round(quantile(dist_shift[,get(objective)], probs = c(.25,.95))))
     
     plot <- ggplot(dist_shift, aes(newdate, get(objective), group = CURR_CAREUNIT)) + 
