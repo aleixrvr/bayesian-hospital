@@ -30,8 +30,6 @@ function(input, output) {
     plot_network_call()$trans_rate_mat
   })
   
-  
-  
   output$departs <- renderTable({
     fread('../../departs.csv')
   })
@@ -40,12 +38,12 @@ function(input, output) {
     plot_network_call()$icu_los
   })
   
-  output$timeseries <- renderPlot({
+  output$timeseries <- renderPlot({withProgress(message = 'Calculation in Progress:', detail = "Please Wait",  {
     aggregation <- reactive({ input$aggregation })
     time_window <- reactive({ input$time_window })
     shift <- reactive({ input$shift })
     objective <- reactive({ input$objective })
-    plot_timeseries(objective(),shift(),time_window(),aggregation())
+    plot_timeseries(objective(),shift(),time_window(),aggregation()) })
     
   })
 }

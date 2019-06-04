@@ -12,7 +12,19 @@ dashboardPage(
     tabItems(
       # First tab content
       tabItem(tabName = "stats",
-              fluidRow(
+              fluidRow(tags$head(
+                tags$style(
+                  HTML(".shiny-notification {
+              height: 50px;
+              width: 800px;
+              position:fixed;
+              top: calc(50% - 50px);;
+              left: calc(50% - 400px);;
+            }
+           "
+                  )
+                )
+              ),
                 box(h2("Time Series for different Features"),
                     plotOutput("timeseries"), width = 9),
                 box(h2("Parameter Selection Time Series"), width = 3,
