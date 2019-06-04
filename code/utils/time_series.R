@@ -27,6 +27,7 @@ plot_timeseries <- function(objective, shift, time_window, aggregation){
         theme(#axis.text.x = element_blank(), 
             #axis.ticks.y = element_blank(),
             strip.text.y = element_text(size=10, face="bold"),
+            strip.text.x = element_text(size=10, face="bold"),
             strip.background = element_rect(colour="white", fill=I("#9ebcda")),
             panel.background = element_rect(fill = 'white', colour = 'white')) +
         scale_x_discrete(breaks = x_breaks, labels = x_labels) + 

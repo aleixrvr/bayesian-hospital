@@ -25,9 +25,9 @@ dashboardPage(
                   )
                 )
               ),
-                box(h2("Time Series for different Features"),
+                box(h2("Time Series for the Selected Parameters"),
                     plotOutput("timeseries"), width = 9),
-                box(h2("Parameter Selection Time Series"), width = 3,
+                box(h2("Parameter Selection"), width = 3,
                     selectInput(inputId="objective", 
                                 label="Select Objective (y-axis): ", 
                                 choices= c("Patients"= "avg_pat", 
@@ -63,31 +63,35 @@ dashboardPage(
                     submitButton("Update View", icon("refresh"))
                 )
               ), 
-              fluidRow(box(h2("Hospital Stats"),
-                           plotOutput("iculos"),width = 6)
+              fluidRow(
+                box(
+                  h2("Distribution of Length of Stay at the ICU"),
+                  plotOutput("iculos"),width = 6),
+                box(h2('Inter-Unit Correlation of Length of Stay'),
+                    plotOutput('los_correlation'), width = 6)
               ),
               fluidRow(
-                h2('LOS correlation'),
-                box(plotOutput('los_correlation'))
-              ),
-              fluidRow(
-                h2('Weekday LOS'),
-                box(plotOutput('week_los'))
+                box(h2('Length of Stay by Weekday and Admission Hour'),
+                    plotOutput('week_los'), width = 6)
               )),
       # Second tab content
       tabItem(tabName = "hospital_graph",
               fluidRow(
-                h2("Department Transition Matrix"),
-                box(plotOutput("transition_matrix")),
-                box(tableOutput("departs"))
+                
+                box(
+                  h2("Inter-Unit Transition Matrix"),
+                  plotOutput("transition_matrix"), width=6),
+                box(
+                  h2("Description of the ICU-Units"),
+                  tableOutput("departs"), width=6)
               ),
               fluidRow(
-                h2("Transition Rate Matrix (per year)"),
-                box(plotOutput("trans_rate_matrix"))
-              ),
-              fluidRow(
-                h2("Hospital Graph"),
-                box(plotOutput("dag"))
+                box(
+                  h2("Average Transitions per Year"),
+                  plotOutput("trans_rate_matrix"), width=6),#
+                box(
+                  h2("Hospital Graph"),
+                  plotOutput("dag"), width=6)
               )
       )
     )

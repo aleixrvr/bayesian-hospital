@@ -49,9 +49,9 @@ plot_network <- function(){
     geom_tile(aes(fill = prop), color = "white") +
     scale_fill_gradient(low = "#e3ebed",
                         high = "#8aa6ad", 
-                        name="PROBABILITY") +
-    xlab("PREVIOUS CARE UNIT") +
-    ylab("CURRENT CARE UNIT") +
+                        name="Probability") +
+      xlab("Previous Care Unit") +
+      ylab("Current Care Unit") +
     scale_x_discrete(limits = rev(levels(trans_summary$PREV_CAREUNIT))) +
     coord_flip() +
     theme_light() +
@@ -76,9 +76,9 @@ plot_network <- function(){
     geom_tile(aes(fill = n), color = "white") +
     scale_fill_gradient(low = "#e3ebed",
                         high = "#8aa6ad", 
-                        name="NUMBER OF TRANSITIONS") +
-    xlab("PREVIOUS CARE UNIT") +
-    ylab("CURRENT CARE UNIT") +
+                        name="Transitions") +
+    xlab("Previous Care Unit") +
+    ylab("Current Care Unit") +
     scale_x_discrete(limits = rev(levels(trans_summary$PREV_CAREUNIT))) +
     coord_flip() +
     theme_light() +
@@ -106,14 +106,14 @@ plot_network <- function(){
     .[, paste(PREV_CAREUNIT, CURR_CAREUNIT, sep='~')] %>% 
     lapply(as.formula) %>% 
     do.call(dagify, .) %>% 
-    ggdag ->
-    hospt_dag
+      ggdag -> hospt_dag
   
   # plot histogram of length of stay in the ICU
   iculos_data <- get_iculos()
-  qplot(iculos_data$LOS, geom="histogram", binwidth = 1, main = "Length of stay in the ICU", 
-        xlab = "Length of stay, days", fill=I("#9ebcda"), col=I("#FFFFFF")) -> icu_los
-  
+  ggplot(data = iculos_data, aes(LOS)) + 
+      geom_histogram(binwidth = 1,fill=I("#9ebcda"), col=I("#FFFFFF")) +
+      theme(panel.background = element_rect(fill = 'white', colour = 'white')) +
+      labs(x="Length of stay in Days", y="Count") -> icu_los
   
   # LOS plot
   transfers %>%    
@@ -131,7 +131,11 @@ plot_network <- function(){
   transfers_mod %>% 
     .[CURR_CAREUNIT != NEXT_CAREUNIT] %>% 
     ggplot(aes(NEXT_LOS, LOS)) +
-    geom_point() +
+    geom_point(color=I("#9ebcda"),size=2,alpha=.4) +
+    labs(y="Length of Stay - Current Unit", x="Length of Stay  - Next Unit") +
+    theme(strip.text.y = element_text(size=10, face="bold"),
+          strip.background = element_rect(colour="white", fill=I("#9ebcda")),
+          panel.background = element_rect(fill = 'white', colour = 'white')) +
     facet_grid(NEXT_CAREUNIT~CURR_CAREUNIT) ->
     trans_los
   
@@ -148,8 +152,12 @@ plot_network <- function(){
   week_trans %>% 
     .[, .(LOS = median(na.omit(LOS))), .(wday, hour)] %>% 
     na.omit %>% 
-    ggplot(aes(hour, LOS))+
-    geom_line() +
+    ggplot(aes(hour, LOS)) +
+    geom_line(color=I("#9ebcda"),size=.6) + 
+    labs(x="Hour of the Day", y="Length of Stay") +
+    theme(strip.text.y = element_text(size=10, face="bold"),
+          strip.background = element_rect(colour="white", fill=I("#9ebcda")),
+          panel.background = element_rect(fill = 'white', colour = 'white')) +
     facet_grid(wday~.) ->
     week_los
   
