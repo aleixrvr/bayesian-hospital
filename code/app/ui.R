@@ -1,6 +1,6 @@
 library(shinydashboard)
 
-dashboardPage(
+dashboardPage(skin = "black",
   dashboardHeader(title = "Hospital Dynamics"),
   dashboardSidebar(
     sidebarMenu(
@@ -58,7 +58,7 @@ dashboardPage(
                     #" ", br(), 
                     dateRangeInput(inputId = "time_window", 
                                    label = "Select the time window for the series", 
-                                   start = "1990-01-01", end = "2210-01-01", 
+                                   start = "2000-01-01", end = "2210-01-01", 
                                    startview = "decade", weekstart = 1), 
                     submitButton("Update View", icon("refresh"))
                 )
