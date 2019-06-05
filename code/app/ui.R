@@ -14,14 +14,8 @@ dashboardPage(skin = "black",
       tabItem(tabName = "stats",
               fluidRow(tags$head(
                 tags$style(
-                  HTML(".shiny-notification {
-              height: 50px;
-              width: 800px;
-              position:fixed;
-              top: calc(50% - 50px);;
-              left: calc(50% - 400px);;
-            }
-           "
+                  HTML(".shiny-notification {height: 100px;width: 800px; position:fixed;top: calc(50% - 50px);
+                  left: calc(50% - 400px);font-size: 32px; background-color: #222d3c; text-align: center; color:#ffffff ;}"
                   )
                 )
               ),
