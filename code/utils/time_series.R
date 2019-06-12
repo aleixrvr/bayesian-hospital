@@ -13,10 +13,12 @@ require(lubridate, quietly = TRUE)
 plot_timeseries <- function(objective, shift, time_window, aggregation){
     dist_shift <- calc_stats(time_window[1], time_window[2], time_aggregation = c("ISOYEAR",aggregation,"DATE"),time_shift = shift)
     dist_shift[, newdate := paste0(ISOYEAR,get(aggregation))]
+    max_date <- max(dist_shift$DATE)
+    min_date <- min(dist_shift$DATE)
     dist_shift <- dist_shift[,.(avg_staff = mean(staff), avg_treat = mean(treatments), avg_pat = mean(patients), avg_los = mean(avg_los)), by=list(CURR_CAREUNIT,newdate)]
     
-    durations <- (time_window[2] - time_window[1]) / 6 
-    x_labels <- c(time_window[1] + durations, time_window[1] + 2 * durations, time_window[1] + 3 * durations, time_window[1] + 4 * durations, time_window[1] + 5 * durations, time_window[1] + 6 * durations)
+    durations <- (max_date - min_date) / 6 
+    x_labels <- c(min_date + durations, min_date + 2 * durations, min_date + 3 * durations, min_date + 4 * durations, min_date + 5 * durations, min_date + 6 * durations)
     x_breaks <- unname(round(quantile(as.numeric(dist_shift$newdate), probs = seq(0, 1, 0.2))))
     y_breaks <- unname(round(quantile(dist_shift[,get(objective)], probs = c(.25,.95))))
     
