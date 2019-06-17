@@ -60,11 +60,13 @@ outflow <- dbGetQuery(con, outflow_sql) %>%
   group_by(CURR_CAREUNIT, OUT_DATE, OUT_HOUR) %>% 
   summarise(OUTFLOW = n())
 outflow <- as.data.table(outflow)
+
 flow_data <- inflow  %>% 
     left_join(y = outflow, by =  c("CURR_UNIT" = "CURR_CAREUNIT", 
                                    "CHART_DATE" = "OUT_DATE", 
                                    "CHART_HOUR" = "OUT_HOUR")) %>% as.data.table()
 flow_data[is.na(OUTFLOW), OUTFLOW := 0]
+
 detailed_inflow <- flow_data[,.("from_OUT"=sum(PREV_CAREUNIT=="OUT"), 
                                 "from_NWARD"=sum(PREV_CAREUNIT=="NWARD"),
                                 "from_NICU"=sum(PREV_CAREUNIT=="NICU"),
@@ -74,16 +76,22 @@ detailed_inflow <- flow_data[,.("from_OUT"=sum(PREV_CAREUNIT=="OUT"),
                                 "from_SICU"=sum(PREV_CAREUNIT=="SICU"),
                                 "from_CCU"=sum(PREV_CAREUNIT=="CCU")), 
                              by=list(CHART_DATE, CHART_HOUR,CURR_UNIT)]
+
 flow_data <- flow_data  %>% 
     left_join(y=detailed_inflow, by=c("CHART_DATE", "CHART_HOUR", "CURR_UNIT")) %>% 
     as.data.table()
+
 flow_data[,PREV_CAREUNIT:= NULL] %>% as.data.frame() -> flow_data
 relabel_cols <- c("from_OUT", "from_NWARD", "from_NICU", "from_MICU", 
                   "from_TSICU", "from_CSRU", "from_SICU", "from_CCU")
 flow_data[relabel_cols][is.na(flow_data[relabel_cols])] <- 0
-flow_data <- as.data.table(flow_data)
-flow_data
-#View(flow_data[1:100])
+
+flow_data <- flow_data %>% 
+  mutate(INFLOW = select(., from_OUT:from_CSRU) %>% rowSums(na.rm = TRUE)) %>%
+  select(CHART_DATE, CHART_HOUR, CURR_UNIT, STAFF, AVG_LOS, LOS_PRO, OUTFLOW, INFLOW, everything()) %>% 
+  as.data.table() 
+
+View(flow_data[1:100])
 
 
 
