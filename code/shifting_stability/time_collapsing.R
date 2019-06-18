@@ -95,7 +95,8 @@ collapse_times <- function(source = "metavision") {
            INTIME_TRANS_SHIFT_2 = INTIME_TRANS + days(SHIFT_2),
            INTIME_TRANS_SHIFT_3 = INTIME_TRANS + days(SHIFT_3),
            INTIME_TRANS_SHIFT_4 = INTIME_TRANS + days(SHIFT_4),
-           INTIME_TRANS_SHIFT_5 = INTIME_TRANS + days(SHIFT_5))
+           INTIME_TRANS_SHIFT_5 = INTIME_TRANS + days(SHIFT_5),
+           LOS_TRANS_ACCURATE = OUTTIME_TRANS - INTIME_TRANS)
   if(source == "carevue") {
     years <- 7
     start_date = "2001-01-01"
@@ -134,11 +135,12 @@ collapse_times <- function(source = "metavision") {
   intime_var_name <- paste0(time,"_COLLAPSED")
   outtime_var_name <- paste0("OUTTIME",substring(time, 7),"_COLLAPSED")
   df_collapsed[[intime_var_name]] <- with(df_collapsed, INTIME_COLLAPSED_date)
-  df_collapsed[[outtime_var_name]] <- with(df_collapsed, INTIME_COLLAPSED_date + lubridate::as.difftime(df$LOS_TRANS, units = "days"))
+  df_collapsed[[outtime_var_name]] <- with(df_collapsed, INTIME_COLLAPSED_date + lubridate::as.difftime(df$LOS_TRANS_ACCURATE, units = "auto"))
   }
   return(df_collapsed)
 }
   
+?as.difftime
 carvue <- collapse_times(source = "carevue")
 metavision <- collapse_times(source = "metavision")
 #all <- collapse_times(source = "all")
@@ -146,7 +148,7 @@ metavision <- collapse_times(source = "metavision")
 # nrow(all)
 
 df_collapsed <- rbind(carvue, metavision) %>% 
-  select(-c(starts_with("OUTTIME_SHIFT")))
+  select(-c(starts_with("OUTTIME_SHIFT"), LOS_TRANS_ACCURATE))
  
 
 glimpse(df_collapsed)
