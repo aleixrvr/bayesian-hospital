@@ -8,6 +8,20 @@ library(lubridate)
 library(ggplot2)
 library(dplyr)
 
+# functions ====
+
+lagpad <- function(x, k = 1) {
+  if (!is.vector(x))
+    stop('x must be a vector')
+  if (!is.numeric(x))
+    stop('x must be numeric')
+  if (!is.numeric(k))
+    stop('k must be numeric')
+  if (1 != length(k))
+    stop('k must be a single number')
+  c(rep(NA, k), x)[1 : length(x)]
+}
+
 # Connection to BigQuery ====
 Sys.setenv(BIGQUERY_TEST_PROJECT="bgse-dsc")
 billing <- bq_test_project()
@@ -22,13 +36,12 @@ con <- dbConnect(
 skeleton_sql <- paste("
 SELECT 
     EXTRACT(DATE FROM CHARTTIME_COLLAPSED) AS CHART_DATE,
-    EXTRACT(HOUR FROM CHARTTIME_COLLAPSED) AS CHART_HOUR,
     CURR_CAREUNIT AS CURR_UNIT, 
     COUNT(DISTINCT CGID) AS STAFF,
     AVG(LOS_TRANS) AS AVG_LOS
 FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_NEW`
-GROUP BY CHART_DATE, CHART_HOUR, CURR_UNIT
-ORDER BY CHART_DATE, CHART_HOUR
+GROUP BY CHART_DATE, CURR_UNIT
+ORDER BY CHART_DATE
 ")
 skeleton <- dbGetQuery(con, skeleton_sql)
 skeleton <- as.data.table(skeleton)
@@ -37,34 +50,31 @@ SELECT
     ICUSTAY_ID,
     CURR_CAREUNIT AS CURR_UNIT,
     IFNULL(ANY_VALUE(PREV_CAREUNIT), ", "'OUT'" , ") AS PREV_CAREUNIT,
-    EXTRACT(DATE FROM ANY_VALUE(INTIME_TRANS_COLLAPSED)) AS CHART_DATE,
-    EXTRACT(HOUR FROM ANY_VALUE(INTIME_TRANS_COLLAPSED)) AS CHART_HOUR
+    EXTRACT(DATE FROM ANY_VALUE(INTIME_TRANS_COLLAPSED)) AS CHART_DATE
 FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_NEW`
 GROUP BY ICUSTAY_ID, CURR_UNIT
-ORDER BY CHART_DATE, CHART_HOUR
+ORDER BY CHART_DATE
 ")
 inflow <- dbGetQuery(con, inflow_sql)
 inflow <- as.data.table(inflow)
 outflow_sql <- paste("
-SELECT ICUSTAY_ID, CHART_DATE, CHART_HOUR, CURR_UNIT, IFNULL(NEXT_CAREUNIT,'OUT') AS NEXT_CAREUNIT
+SELECT ICUSTAY_ID, CHART_DATE, CURR_UNIT, IFNULL(NEXT_CAREUNIT,'OUT') AS NEXT_CAREUNIT
 FROM 
 (   SELECT 
         ICUSTAY_ID,
         CURR_CAREUNIT AS CURR_UNIT, 
-        ANY_VALUE(EXTRACT(DATE FROM OUTTIME_TRANS_COLLAPSED)) AS CHART_DATE,
-        ANY_VALUE(EXTRACT(HOUR FROM OUTTIME_TRANS_COLLAPSED)) AS CHART_HOUR
+        ANY_VALUE(EXTRACT(DATE FROM OUTTIME_TRANS_COLLAPSED)) AS CHART_DATE
     FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_FINAL` 
     GROUP BY ICUSTAY_ID, CURR_UNIT) AS L
 LEFT JOIN 
 (   SELECT 
         ICUSTAY_ID,
         CURR_CAREUNIT AS NEXT_CAREUNIT, 
-        ANY_VALUE(EXTRACT(DATE FROM INTIME_TRANS_COLLAPSED)) AS CHART_DATE,
-        ANY_VALUE(EXTRACT(HOUR FROM INTIME_TRANS_COLLAPSED)) AS CHART_HOUR
+        ANY_VALUE(EXTRACT(DATE FROM INTIME_TRANS_COLLAPSED)) AS CHART_DATE
     FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_FINAL` 
     GROUP BY ICUSTAY_ID, NEXT_CAREUNIT) AS R
-USING(ICUSTAY_ID, CHART_DATE, CHART_HOUR)
-ORDER BY CHART_DATE, CHART_HOUR
+USING(ICUSTAY_ID, CHART_DATE)
+ORDER BY CHART_DATE
 ")
 outflow <- dbGetQuery(con, outflow_sql)
 outflow <- as.data.table(outflow)
@@ -78,7 +88,7 @@ detailed_inflow <- inflow[,.("from_OUT"=sum(PREV_CAREUNIT=="OUT"),
                                 "from_CSRU"=sum(PREV_CAREUNIT=="CSRU"),
                                 "from_SICU"=sum(PREV_CAREUNIT=="SICU"),
                                 "from_CCU"=sum(PREV_CAREUNIT=="CCU")), 
-                             by=list(CHART_DATE, CHART_HOUR,CURR_UNIT)]
+                             by=list(CHART_DATE,CURR_UNIT)]
 
 detailed_outflow <- outflow[,.("to_OUT"=sum(NEXT_CAREUNIT=="OUT"), 
                                  "to_NWARD"=sum(NEXT_CAREUNIT=="NWARD"),
@@ -88,12 +98,12 @@ detailed_outflow <- outflow[,.("to_OUT"=sum(NEXT_CAREUNIT=="OUT"),
                                  "to_CSRU"=sum(NEXT_CAREUNIT=="CSRU"),
                                  "to_SICU"=sum(NEXT_CAREUNIT=="SICU"),
                                  "to_CCU"=sum(NEXT_CAREUNIT=="CCU")), 
-                              by=list(CHART_DATE, CHART_HOUR,CURR_UNIT)]
+                              by=list(CHART_DATE,CURR_UNIT)]
 
 # Merge stuff ====
 flow_data <- skeleton  %>% 
-    left_join(y=detailed_inflow, by=c("CHART_DATE", "CHART_HOUR", "CURR_UNIT")) %>% 
-    left_join(y=detailed_outflow, by=c("CHART_DATE", "CHART_HOUR", "CURR_UNIT")) %>% 
+    left_join(y=detailed_inflow, by=c("CHART_DATE", "CURR_UNIT")) %>% 
+    left_join(y=detailed_outflow, by=c("CHART_DATE", "CURR_UNIT")) %>% 
     as.data.table()
 
 # Cleaning Dataset ====
@@ -107,46 +117,4 @@ flow_data[relabel_cols][is.na(flow_data[relabel_cols])] <- 0
 flow_data["INFLOW"] <- rowSums(flow_data[in_cols])
 flow_data["OUTFLOW"] <- rowSums(flow_data[out_cols])
 flow_data <- as.data.table(flow_data)
-
-flow_data
-
-lagpad <- function(x, k = 1) {
-  if (!is.vector(x))
-    stop('x must be a vector')
-  if (!is.numeric(x))
-    stop('x must be numeric')
-  if (!is.numeric(k))
-    stop('k must be numeric')
-  if (1 != length(k))
-    stop('k must be a single number')
-  c(rep(NA, k), x)[1 : length(x)]
-}
-
-
-CCU_flow <- flow_data %>% 
-  filter(CURR_UNIT == "CCU") %>% 
-  mutate_at(c("from_OUT" ,"from_NWARD" ,"from_NICU", "from_MICU", "from_TSICU" ,"from_CSRU" ,"from_SICU" ,"from_CCU" ), lagpad) %>% 
-  select(-c(AVG_LOS)) %>% 
-  mutate(net_flow = OUTFLOW - INFLOW,
-         max_wait = 1/5,
-         waiting_time = 1/pmax(net_flow, max_wait))  
-
-CSRU_flow <- flow_data %>% 
-  filter(CURR_UNIT == "CSRU") %>% 
-  select(-c(AVG_LOS)) 
-
-MICU_flow <- flow_data %>% 
-  filter(CURR_UNIT == "MICU") %>% 
-  select(-c(AVG_LOS)) 
-
-SICU_flow <- flow_data %>% 
-  filter(CURR_UNIT == "SICU") %>% 
-  select(-c(AVG_LOS)) 
-
-TSICU_flow <- flow_data %>% 
-  filter(CURR_UNIT == "TSICU") %>% 
-  select(-c(AVG_LOS)) 
-
-
-
 
