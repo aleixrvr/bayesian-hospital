@@ -110,4 +110,43 @@ flow_data <- as.data.table(flow_data)
 
 flow_data
 
+lagpad <- function(x, k = 1) {
+  if (!is.vector(x))
+    stop('x must be a vector')
+  if (!is.numeric(x))
+    stop('x must be numeric')
+  if (!is.numeric(k))
+    stop('k must be numeric')
+  if (1 != length(k))
+    stop('k must be a single number')
+  c(rep(NA, k), x)[1 : length(x)]
+}
+
+
+CCU_flow <- flow_data %>% 
+  filter(CURR_UNIT == "CCU") %>% 
+  mutate_at(c("from_OUT" ,"from_NWARD" ,"from_NICU", "from_MICU", "from_TSICU" ,"from_CSRU" ,"from_SICU" ,"from_CCU" ), lagpad) %>% 
+  select(-c(AVG_LOS)) %>% 
+  mutate(net_flow = OUTFLOW - INFLOW,
+         max_wait = 1/5,
+         waiting_time = 1/pmax(net_flow, max_wait))  
+
+CSRU_flow <- flow_data %>% 
+  filter(CURR_UNIT == "CSRU") %>% 
+  select(-c(AVG_LOS)) 
+
+MICU_flow <- flow_data %>% 
+  filter(CURR_UNIT == "MICU") %>% 
+  select(-c(AVG_LOS)) 
+
+SICU_flow <- flow_data %>% 
+  filter(CURR_UNIT == "SICU") %>% 
+  select(-c(AVG_LOS)) 
+
+TSICU_flow <- flow_data %>% 
+  filter(CURR_UNIT == "TSICU") %>% 
+  select(-c(AVG_LOS)) 
+
+
+
 
