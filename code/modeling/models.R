@@ -1,3 +1,4 @@
+library(stargazer)
 source("code/modeling/data_prep.R")
 
 model_data <- flow_data %>% 
