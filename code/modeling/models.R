@@ -34,17 +34,74 @@ CCU_flow <- CCU_flow  %>%
   left_join(y = SICU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
   rename(l_waiting_time_sicu = l_waiting_time) %>% 
   left_join(y = TSICU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
-  rename(l_waiting_time_tsicu = l_waiting_time)
+  rename(l_waiting_time_tsicu = l_waiting_time, 
+         l_waiting_time = l_waiting_time.x)
 
-glimpse(CCU_flow)
+CSRU_flow <- CSRU_flow  %>% 
+  left_join(y = CCU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
+  rename(l_waiting_time_ccu = l_waiting_time.y) %>% 
+  left_join(y = MICU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
+  rename(l_waiting_time_micu = l_waiting_time) %>% 
+  left_join(y = SICU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
+  rename(l_waiting_time_sicu = l_waiting_time) %>% 
+  left_join(y = TSICU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
+  rename(l_waiting_time_tsicu = l_waiting_time,
+         l_waiting_time = l_waiting_time.x)
 
-summary(lm(INFLOW ~ ., CCU_flow %>% select(INFLOW, starts_with("from_"), -from_CCU)))
-summary(lm(OUTFLOW ~ ., CCU_flow %>% select(OUTFLOW, STAFF, starts_with("l_waiting_time_"))))
+MICU_flow <- MICU_flow  %>% 
+  left_join(y = CCU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
+  rename(l_waiting_time_ccu = l_waiting_time.y) %>% 
+  left_join(y = CSRU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
+  rename(l_waiting_time_csru = l_waiting_time) %>% 
+  left_join(y = SICU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
+  rename(l_waiting_time_sicu = l_waiting_time) %>% 
+  left_join(y = TSICU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
+  rename(l_waiting_time_tsicu = l_waiting_time,
+         l_waiting_time = l_waiting_time.x)
+
+SICU_flow <- SICU_flow  %>% 
+  left_join(y = CCU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
+  rename(l_waiting_time_ccu = l_waiting_time.y) %>% 
+  left_join(y = CSRU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
+  rename(l_waiting_time_csru = l_waiting_time) %>% 
+  left_join(y = MICU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
+  rename(l_waiting_time_micu = l_waiting_time) %>% 
+  left_join(y = TSICU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
+  rename(l_waiting_time_tsicu = l_waiting_time,
+         l_waiting_time = l_waiting_time.x)
+
+TSICU_flow <- TSICU_flow  %>% 
+  left_join(y = CCU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
+  rename(l_waiting_time_ccu = l_waiting_time.y) %>% 
+  left_join(y = CSRU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
+  rename(l_waiting_time_crsu = l_waiting_time) %>% 
+  left_join(y = MICU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
+  rename(l_waiting_time_micu = l_waiting_time) %>% 
+  left_join(y = SICU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
+  rename(l_waiting_time_sicu = l_waiting_time,
+         l_waiting_time = l_waiting_time.x)
 
 
+## OLS models
+
+inflow_ccu_mod <- lm(INFLOW ~ ., CCU_flow %>% select(INFLOW, starts_with("from_"), -from_CCU))
+outflow_ccu_mod <- lm(OUTFLOW ~ ., CCU_flow %>% select(OUTFLOW, STAFF, starts_with("l_waiting_time_")))
+
+inflow_csru_mod <- lm(INFLOW ~ ., CSRU_flow %>% select(INFLOW, starts_with("from_"), -from_CSRU))
+outflow_csru_mod <- lm(OUTFLOW ~ ., CSRU_flow %>% select(OUTFLOW, STAFF, starts_with("l_waiting_time_")))
+
+inflow_micu_mod <- lm(INFLOW ~ ., MICU_flow %>% select(INFLOW, starts_with("from_"), -from_MICU))
+outflow_micu_mod <-lm(OUTFLOW ~ ., MICU_flow %>% select(OUTFLOW, STAFF, starts_with("l_waiting_time_")))
+
+inflow_sicu_mod <- lm(INFLOW ~ ., SICU_flow %>% select(INFLOW, starts_with("from_"), -from_SICU))
+outflow_sicu_mod <-lm(OUTFLOW ~ ., SICU_flow %>% select(OUTFLOW, STAFF, starts_with("l_waiting_time_")))
+
+inflow_tsicu_mod <- lm(INFLOW ~ ., TSICU_flow %>% select(INFLOW, starts_with("from_"), -from_TSICU))
+outflow_tsiu_mod <-lm(OUTFLOW ~ ., TSICU_flow %>% select(OUTFLOW, STAFF, starts_with("l_waiting_time_")))
 
 
-
+stargazer(inflow_ccu_mod, inflow_csru_mod, inflow_micu_mod, inflow_sicu_mod, inflow_tsicu_mod, title="Results", align=TRUE, type = "latex")
+stargazer(outflow_ccu_mod, outflow_csru_mod, outflow_micu_mod, outflow_sicu_mod, inflow_tsicu_mod, title="Results", align=TRUE, type = "latex")
 
 
 
