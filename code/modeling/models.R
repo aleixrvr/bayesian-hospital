@@ -36,7 +36,9 @@ CCU_flow <- CCU_flow  %>%
   left_join(y = TSICU_flow %>% select(CHART_DATE, l_waiting_time), by =  c("CHART_DATE" = "CHART_DATE")) %>% 
   rename(l_waiting_time_tsicu = l_waiting_time)
 
-summary(lm(INFLOW ~ ., CCU_flow %>% select(INFLOW, starts_with("from_"), from_CCU)))
+glimpse(CCU_flow)
+
+summary(lm(INFLOW ~ ., CCU_flow %>% select(INFLOW, starts_with("from_"), -from_CCU)))
 summary(lm(OUTFLOW ~ ., CCU_flow %>% select(OUTFLOW, STAFF, starts_with("l_waiting_time_"))))
 
 
