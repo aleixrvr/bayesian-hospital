@@ -1,5 +1,5 @@
 library(stargazer)
-source("code/modeling/data_prep_hour.R")
+#source("code/modeling/data_prep_hour.R")
 
 model_data <- flow_data %>% 
   group_by(CURR_UNIT) %>% 
@@ -123,7 +123,7 @@ inflow_sicu_mod <- lm(INFLOW ~ ., SICU_flow %>% select(INFLOW, starts_with("from
 outflow_sicu_mod <-lm(OUTFLOW ~ ., SICU_flow %>% select(OUTFLOW, STAFF, starts_with("l1_waiting_time_")))
 
 inflow_tsicu_mod <- lm(INFLOW ~ ., TSICU_flow %>% select(INFLOW, starts_with("from_"), -from_TSICU))
-outflow_tsiu_mod <-lm(OUTFLOW ~ ., TSICU_flow %>% select(OUTFLOW, STAFF, starts_with("l1_waiting_time_")))
+outflow_tsicu_mod <-lm(OUTFLOW ~ ., TSICU_flow %>% select(OUTFLOW, STAFF, starts_with("l1_waiting_time_")))
 
 
 summary(outflow_tsiu_mod)
