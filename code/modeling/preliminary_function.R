@@ -7,7 +7,10 @@ theta_thres <- function(net_flow, w_max){
 }
 waiting_do <- function(unit_flow_data, r){#}, reg_list){
   #1/ theta_thres(
+  
+  # beta_0
   outflow_ccu_mod$coefficients["(Intercept)"] + 
+    # beta_w_crsu - fraction
     outflow_ccu_mod$coefficients["l1_waiting_time_csru"] * 1/ theta_thres(
       outflow_csru_mod$coefficients["(Intercept)"] +
         outflow_csru_mod$coefficients[c("l1_waiting_time_ccu", "l1_waiting_time_micu", 
@@ -17,8 +20,10 @@ waiting_do <- function(unit_flow_data, r){#}, reg_list){
         outflow_csru_mod$coefficients["STAFF"] * unit_flow_data$l_STAFF_csru +
         unit_flow_data$l_INFLOW_csru
       , 1/2) + 
+    # beta_w_micu - fraction
     outflow_ccu_mod$coefficients["l1_waiting_time_micu"] * 1/ theta_thres(
       outflow_micu_mod$coefficients["(Intercept)"] +
+        # beta_w_downstream
         outflow_micu_mod$coefficients[c("l1_waiting_time_ccu", "l1_waiting_time_csru", 
                                         "l1_waiting_time_sicu", "l1_waiting_time_tsicu")] %*%
         t(unit_flow_data[c("l2_waiting_time", "l2_waiting_time_micu", 
@@ -26,8 +31,10 @@ waiting_do <- function(unit_flow_data, r){#}, reg_list){
         outflow_micu_mod$coefficients["STAFF"] * unit_flow_data$l_STAFF_micu +
         unit_flow_data$l_INFLOW_micu
       , 1/2) + 
+    # beta_w_sicu - fraction
     outflow_ccu_mod$coefficients["l1_waiting_time_sicu"] * 1/ theta_thres(
       outflow_sicu_mod$coefficients["(Intercept)"] +
+        # beta_w_downstream
         outflow_sicu_mod$coefficients[c("l1_waiting_time_ccu", "l1_waiting_time_csru", 
                                         "l1_waiting_time_micu", "l1_waiting_time_tsicu")] %*%
         t(unit_flow_data[c("l2_waiting_time", "l2_waiting_time_csru", 
@@ -35,8 +42,10 @@ waiting_do <- function(unit_flow_data, r){#}, reg_list){
         outflow_sicu_mod$coefficients["STAFF"] * unit_flow_data$l_STAFF_sicu +
         unit_flow_data$l_INFLOW_sicu
       , 1/2) + 
+    # beta_w_tsicu - fraction
     outflow_ccu_mod$coefficients["l1_waiting_time_tsicu"] * 1/ theta_thres(
       outflow_tsicu_mod$coefficients["(Intercept)"] +
+        # beta_w_downstream
         outflow_tsicu_mod$coefficients[c("l1_waiting_time_ccu", "l1_waiting_time_crsu", 
                                          "l1_waiting_time_sicu", "l1_waiting_time_micu")] %*%
         t(unit_flow_data[c("l2_waiting_time", "l2_waiting_time_csru", 
@@ -44,7 +53,9 @@ waiting_do <- function(unit_flow_data, r){#}, reg_list){
         outflow_tsicu_mod$coefficients["STAFF"] * unit_flow_data$l_STAFF_tsicu +
         unit_flow_data$l_INFLOW_tsicu
       , 1/2) + 
+    # do_r
     outflow_ccu_mod$coefficients["STAFF"] * r - 
+    # inflow
     unit_flow_data$INFLOW#, 1/2)
 }
 
