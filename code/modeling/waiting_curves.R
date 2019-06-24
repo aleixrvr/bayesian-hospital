@@ -81,12 +81,12 @@ waiting_do <- function(unit, unit_flow_data, outflow_models, r = c(50,70), w_max
     colnames(pred_data) <- orig_cols
   }
   # estimate waiting time curves by varying staff in the unit of interest 
-  to_plot <- data.frame(ressources=integer(), waiting_time=integer(), do_unit=character())
+  to_plot <- data.frame(ressources=integer(), waiting_time=integer())#, do_unit=character())
   for(ressources in r[1]:r[2]){
     df <- data.frame(matrix(unlist(pred_outflows), ncol=length(pred_outflows), byrow=FALSE))
     df <- cbind(ressources, df)
     colnames(df) <- c("STAFF", paste0("l1_waiting_time_",names(pred_outflows)))
-    to_plot[ressources, "do_unit"] <- unit
+    #to_plot[ressources, "do_unit"] <- unit
     to_plot[ressources, "ressources"] <- ressources
     to_plot[ressources, "waiting_time"] <- 
       mean(1 / theta_thres(data.frame(predict(outflow_models[[unit]], df) - pred_data$INFLOW), w_max))
