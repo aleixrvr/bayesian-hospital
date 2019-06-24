@@ -39,7 +39,6 @@ for(i in units){
                             by = c("CHART_DATE", "CHART_HOUR"), 
                             suffixes = c("", paste0("_", m)))
   }
-  
 }
 rm(list=c("to_merge", "i", "m", "lagpad"))
 
@@ -60,7 +59,7 @@ stargazer(outflow_models, title="Results", align=TRUE, type = "latex")
 rm(list=c("i", "to_model_outflow", "to_model_inflow","units"))
 
 # Waiting times curves ====
-waiting_do <- function(unit, unit_flow_data, outflow_models, r = c(50,70), w_max = 3){
+waiting_do <- function(unit, unit_flow_data, outflow_models, r = c(0,100), w_max = 3){
   # set units in the ICU to be examined
   all_units <- names(unit_flow_data)
   units <- all_units[all_units != unit]
