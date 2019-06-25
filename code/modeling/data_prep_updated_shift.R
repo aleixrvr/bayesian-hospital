@@ -157,8 +157,42 @@ flow_data["INFLOW"] <- rowSums(flow_data[in_cols])
 flow_data["OUTFLOW"] <- rowSums(flow_data[out_cols])
 flow_data <- as.data.table(flow_data)
 
+# Create relevant features for each dataset ====
+unit_flow <- split(flow_data,by="CURR_UNIT")
+unit_flow <- lapply(unit_flow, function(X){
+  X$waiting_time <- 1 / theta_thres(data.frame(X$OUTFLOW - X$INFLOW), 3)
+  X[is.na(X$STAFF),]$waiting_time <- 0
+  X$l1_waiting_time <- lagpad(X$waiting_time)
+  X$l2_waiting_time <- lagpad(X$waiting_time, 2)
+  # X[is.na(X$STAFF),"STAFF"] <- median(X$STAFF, na.rm = TRUE)
+  X$l_OUTFLOW = lagpad(X$OUTFLOW)
+  X$l_STAFF = lagpad(X$STAFF)
+  X$l_INFLOW = lagpad(X$INFLOW)
+  #X <- X[complete.cases(X)]
+  as.data.table(X)
+})
+
+# Merge  relevant features for each dataset ====
+units <- names(unit_flow)
+for(i in units){
+  to_merge <- units[units != i]
+  for(m in to_merge){
+    unit_flow[[i]] <- merge(unit_flow[[i]], unit_flow[[m]][,c("CHART_DATE", 
+                                                              "CHART_SHIFT", 
+                                                              "l1_waiting_time", 
+                                                              "l2_waiting_time", 
+                                                              "l_STAFF", 
+                                                              "l_INFLOW")], 
+                            by = c("CHART_DATE", "CHART_SHIFT"), 
+                            suffixes = c("", paste0("_", m)))
+  }
+}
+
+unit_flow_shift <- unit_flow
+
 rm(list=c("billing", "con", "detailed_inflow", "detailed_outflow","in_cols", 
           "inflow", "inflow_sql", "out_cols", "outflow", "outflow_sql",
           "relabel_cols", "skeleton", "skeleton_sql", "dates_sql", "units",
-          "units_sql", "dates", "frame"))
+          "units_sql", "dates", "frame","to_merge", "i", "m", "lagpad", 
+          "flow_data", "unit_flow"))
 
