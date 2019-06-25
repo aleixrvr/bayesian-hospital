@@ -1,15 +1,7 @@
-# download model data ====
-library(stargazer)
-source("../modeling/data_prep_hour.R")
-rm(list=c("billing", "con", "detailed_inflow", "detailed_outflow","in_cols", 
-          "inflow", "inflow_sql", "out_cols", "outflow", "outflow_sql",
-          "relabel_cols", "skeleton", "skeleton_sql"))
-theta_thres <- function(net_flow, w_max){
-  apply(net_flow, 1, function(x) max(x,(1/w_max)))
-}
+# library, download model data, functions ====
+source("code/modeling/data_prep_updated_hour.R")
 
 # create relevant features for each dataset ====
-flow_data[,AVG_LOS:=NULL]
 unit_flow <- split(flow_data,by="CURR_UNIT")
 unit_flow <- lapply(unit_flow, function(X){
   X %>% mutate(net_flow = OUTFLOW - INFLOW, 
