@@ -1,11 +1,17 @@
 # library, download model data, functions ====
-source("code/modeling/data_prep_updated_hour.R")
+source("code/modeling/data_prep_hour.R")
+rm(list=c("billing", "con", "detailed_inflow", "detailed_outflow","in_cols", 
+          "inflow", "inflow_sql", "out_cols", "outflow", "outflow_sql",
+          "relabel_cols", "skeleton", "skeleton_sql"))
+theta_thres <- function(net_flow, w_max){
+  apply(net_flow, 1, function(x) max(x,(1/w_max)))
+}
 
 # create relevant features for each dataset ====
 unit_flow <- split(flow_data,by="CURR_UNIT")
 unit_flow <- lapply(unit_flow, function(X){
   X %>% mutate(net_flow = OUTFLOW - INFLOW, 
-               max_wait = 1/3, 
+               max_wait = 1/4, 
                waiting_time = 1/pmax(net_flow, max_wait),
                l1_waiting_time = lagpad(waiting_time),
                l2_waiting_time = lagpad(waiting_time, 2),
@@ -49,7 +55,6 @@ for(i in units){
 stargazer(inflow_models, title="Results", align=TRUE, type = "latex")
 stargazer(outflow_models, title="Results", align=TRUE, type = "latex")
 rm(list=c("i", "to_model_outflow", "to_model_inflow","units"))
-outflow_models["CCU"]
 
 # Waiting times curves ====
 waiting_do <- function(unit, unit_flow_data, outflow_models, r = c(0,100), w_max = 3){
