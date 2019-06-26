@@ -9,6 +9,16 @@ library(ggplot2)
 unit_flow <- unit_flow_shift
 # unit_flow <- unit_flow_day
 # Modelling ====
+
+
+## Removing NICU
+unit_flow[['NICU']] = NULL
+unit_names <- names(unit_flow)
+unit_flow <- lapply(unit_flow, function(X){
+  X %>% select(-contains('NICU')) 
+})
+names(unit_flow) <- unit_names
+
 units <- names(unit_flow)
 inflow_models <- list()
 outflow_models <- list()
@@ -21,14 +31,15 @@ for(i in units){
     outflow_models[[i]] <- lm(OUTFLOW ~ ., to_model_outflow)
 }
 
-stargazer(inflow_models, title="Results", align=TRUE, type = "latex")
-stargazer(outflow_models, title="Results", align=TRUE, type = "latex")
+# stargazer(inflow_models, title="Results", align=TRUE, type = "latex")
+# stargazer(outflow_models, title="Results", align=TRUE, type = "latex")
 rm(list=c("i", "to_model_outflow", "to_model_inflow","units"))
 outflow_models
 
 # Waiting times curves ====
 waiting_do <- function(unit, unit_flow_data, outflow_models, r = c(1,100), w_max = 3){
     # set units in the ICU to be examined
+    do_unit <- unit
     all_units <- names(unit_flow_data)
     units <- all_units[all_units != unit]
     # prepare data for the selected unit
@@ -51,13 +62,13 @@ waiting_do <- function(unit, unit_flow_data, outflow_models, r = c(1,100), w_max
         colnames(pred_data) <- orig_cols
     }
     # estimate waiting time curves by varying staff in the unit of interest 
-    to_plot <- data.frame(ressources=integer(), waiting_time=integer(), unit=character())#, do_unit=character())
+    to_plot <- data.frame(ressources=integer(), waiting_time=integer(), unit=character(), do_unit=character())
     for(ressources in r[1]:r[2]){
         df <- data.frame(matrix(unlist(pred_outflows), ncol=length(pred_outflows), byrow=FALSE))
         df <- cbind(ressources, df)
         colnames(df) <- c("STAFF", paste0("l1_waiting_time_",names(pred_outflows)))
         waiting_time <- mean(1 / theta_thres(data.frame(predict(outflow_models[[unit]], df) - pred_data$INFLOW), w_max))
-        to_plot <- rbind(to_plot, data.frame(ressources, waiting_time, unit))
+        to_plot <- rbind(to_plot, data.frame(ressources, waiting_time, unit, do_unit))
     }
     
     # estimate waiting time curves by varying staff in the downstream units
@@ -77,7 +88,7 @@ waiting_do <- function(unit, unit_flow_data, outflow_models, r = c(1,100), w_max
         df <- cbind(staff_data, df)
         colnames(df) <- c("STAFF", paste0("l1_waiting_time_",names(pred_outflows)))
         waiting_time <- mean(1 / theta_thres(data.frame(predict(outflow_models[[unit]], df) - pred_data$INFLOW), w_max))
-        to_plot <- rbind(to_plot, data.frame(ressources, waiting_time, unit=downstream_unit))
+        to_plot <- rbind(to_plot, data.frame(ressources, waiting_time, unit=downstream_unit, do_unit))
       }
       
       pred_outflows[[downstream_unit]] <- pred_outflows_old
@@ -95,9 +106,16 @@ waiting_do <- function(unit, unit_flow_data, outflow_models, r = c(1,100), w_max
 # }
 # par(mfrow=c(1,1))
 
-see <- waiting_do("CCU", unit_flow, outflow_models)
-ggplot(see, aes(ressources, waiting_time, group=unit, color=unit)) +
-  geom_line()
+to_plot <- data.frame(ressources=integer(), waiting_time=integer(), unit=character(), do_unit=character())
+for(unit_name in names(unit_flow)){
+  do_waiting <- waiting_do(unit_name, unit_flow, outflow_models)
+  to_plot <- rbind(to_plot, do_waiting)
+}
+
+
+ggplot(to_plot, aes(ressources, waiting_time, group=unit, color=unit)) +
+  geom_line() +
+  facet_grid(.~do_unit)
 
 # plot(see$ressources, see$waiting_time,type = "l", col="tomato", lwd=2)
 
