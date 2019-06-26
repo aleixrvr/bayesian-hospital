@@ -35,6 +35,22 @@ con <- dbConnect(
     billing = billing
 )
 
+# Specify shift length ====
+total_hours <- 24
+splits <- 2
+shift_selection <- "CASE \n"
+pos = 1
+for( time in seq(splits, total_hours, splits)){
+  shift_selection <- paste0(shift_selection, "WHEN EXTRACT(HOUR FROM CHARTTIME_COLLAPSED) < ")
+  shift_selection <- paste0(shift_selection, time)
+  shift_selection <- paste0(shift_selection, ' THEN ')
+  shift_selection <- paste0(shift_selection, pos)
+  shift_selection <- paste0(shift_selection, '\n')
+  pos = pos + 1
+  
+}
+shift_selection <- paste0(shift_selection, 'END')
+
 # build date hour framework ====
 dates_sql <- paste("SELECT 
                         MIN(EXTRACT(DATE FROM CHARTTIME_COLLAPSED)) AS min_date, 
@@ -54,11 +70,8 @@ colnames(frame)[1] <- "CHART_DATE"
 # Raw Data ====
 skeleton_sql <- paste("
 SELECT 
-    EXTRACT(DATE FROM CHARTTIME_COLLAPSED) AS CHART_DATE,
-    CASE 
-      WHEN EXTRACT(HOUR FROM CHARTTIME_COLLAPSED) < 8 THEN 1
-      WHEN EXTRACT(HOUR FROM CHARTTIME_COLLAPSED) > 15 THEN 3
-      ELSE 2 END AS CHART_SHIFT,
+    EXTRACT(DATE FROM CHARTTIME_COLLAPSED) AS CHART_DATE, ",
+    shift_selection, "AS CHART_SHIFT,
     CURR_CAREUNIT AS CURR_UNIT, 
     COUNT(DISTINCT CGID) AS STAFF,
     AVG(LOS_TRANS) AS AVG_LOS,
@@ -74,11 +87,8 @@ SELECT
     ICUSTAY_ID,
     CURR_CAREUNIT AS CURR_UNIT,
     IFNULL(ANY_VALUE(PREV_CAREUNIT), ", "'OUT'" , ") AS PREV_CAREUNIT,
-    EXTRACT(DATE FROM ANY_VALUE(INTIME_TRANS_COLLAPSED)) AS CHART_DATE,
-    CASE 
-      WHEN EXTRACT(HOUR FROM ANY_VALUE(INTIME_TRANS_COLLAPSED)) < 8 THEN 1
-      WHEN EXTRACT(HOUR FROM ANY_VALUE(INTIME_TRANS_COLLAPSED)) > 15 THEN 3
-      ELSE 2 END AS CHART_SHIFT
+    EXTRACT(DATE FROM ANY_VALUE(INTIME_TRANS_COLLAPSED)) AS CHART_DATE,",
+                    shift_selection, " AS CHART_SHIFT
 FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_NEW`
 GROUP BY ICUSTAY_ID, CURR_UNIT
 ORDER BY CHART_DATE, CHART_SHIFT
@@ -91,22 +101,16 @@ FROM
 (   SELECT 
         ICUSTAY_ID,
         CURR_CAREUNIT AS CURR_UNIT, 
-        ANY_VALUE(EXTRACT(DATE FROM OUTTIME_TRANS_COLLAPSED)) AS CHART_DATE,
-        CASE 
-          WHEN ANY_VALUE(EXTRACT(HOUR FROM OUTTIME_TRANS_COLLAPSED)) < 8 THEN 1
-          WHEN ANY_VALUE(EXTRACT(HOUR FROM OUTTIME_TRANS_COLLAPSED)) > 15 THEN 3
-          ELSE 2 END AS CHART_SHIFT
+        ANY_VALUE(EXTRACT(DATE FROM OUTTIME_TRANS_COLLAPSED)) AS CHART_DATE,",
+                     shift_selection, " AS CHART_SHIFT
     FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_FINAL` 
     GROUP BY ICUSTAY_ID, CURR_UNIT) AS L
 LEFT JOIN 
 (   SELECT 
         ICUSTAY_ID,
         CURR_CAREUNIT AS NEXT_CAREUNIT, 
-        ANY_VALUE(EXTRACT(DATE FROM INTIME_TRANS_COLLAPSED)) AS CHART_DATE,
-        CASE 
-          WHEN ANY_VALUE(EXTRACT(HOUR FROM INTIME_TRANS_COLLAPSED)) < 8 THEN 1
-          WHEN ANY_VALUE(EXTRACT(HOUR FROM INTIME_TRANS_COLLAPSED)) > 15 THEN 3
-          ELSE 2 END AS CHART_SHIFT
+        ANY_VALUE(EXTRACT(DATE FROM INTIME_TRANS_COLLAPSED)) AS CHART_DATE,",
+                     shift_selection, " AS CHART_SHIFT
     FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_FINAL` 
     GROUP BY ICUSTAY_ID, NEXT_CAREUNIT) AS R
 USING(ICUSTAY_ID, CHART_DATE, CHART_SHIFT)
@@ -160,7 +164,7 @@ flow_data <- as.data.table(flow_data)
 # Create relevant features for each dataset ====
 unit_flow <- split(flow_data,by="CURR_UNIT")
 unit_flow <- lapply(unit_flow, function(X){
-  X$waiting_time <- 1 / theta_thres(data.frame(X$OUTFLOW - X$INFLOW), 3)
+  X$waiting_time <- 1 / theta_thres(data.frame(X$OUTFLOW - X$INFLOW), 1)
   X[is.na(X$STAFF),]$waiting_time <- 0
   X$l1_waiting_time <- lagpad(X$waiting_time)
   X$l2_waiting_time <- lagpad(X$waiting_time, 2)

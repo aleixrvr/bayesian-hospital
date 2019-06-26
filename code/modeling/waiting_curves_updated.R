@@ -2,8 +2,11 @@
 source("code/modeling/data_prep_updated_hour.R")
 source("code/modeling/data_prep_updated_shift.R")
 source("code/modeling/data_prep_updated_day.R")
+ls()
 
+unit_flow <- unit_flow_shift
 # Modelling ====
+units <- names(unit_flow)
 inflow_models <- list()
 outflow_models <- list()
 for(i in units){
@@ -30,6 +33,7 @@ waiting_do <- function(unit, unit_flow_data, outflow_models, r = c(0,100), w_max
         select(starts_with("l_STAFF_"), starts_with("l_INFLOW_"), 
                starts_with("l2_waiting_time_"), 
                l2_waiting_time, INFLOW) %>% as.data.table() -> pred_data
+    pred_data <- pred_data[complete.cases(pred_data)]
     colnames(pred_data)[colnames(pred_data) == "l2_waiting_time"] <- paste0("l2_waiting_time_",unit)
     colnames(pred_data) <- gsub("2","1",colnames(pred_data))
     # estimate outflows for downstream units

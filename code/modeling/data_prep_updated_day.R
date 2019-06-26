@@ -143,7 +143,7 @@ flow_data <- as.data.table(flow_data)
 # Create relevant features for each dataset ====
 unit_flow <- split(flow_data,by="CURR_UNIT")
 unit_flow <- lapply(unit_flow, function(X){
-    X$waiting_time <- 1 / theta_thres(data.frame(X$OUTFLOW - X$INFLOW), 3)
+    X$waiting_time <- 1 / theta_thres(data.frame(X$OUTFLOW - X$INFLOW), 1)
     X[is.na(X$STAFF),]$waiting_time <- 0
     X$l1_waiting_time <- lagpad(X$waiting_time)
     X$l2_waiting_time <- lagpad(X$waiting_time, 2)
