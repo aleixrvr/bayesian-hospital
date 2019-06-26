@@ -1,7 +1,7 @@
 # library, download model data, functions ====
-source("code/modeling/data_prep_updated_hour.R")
+#source("code/modeling/data_prep_updated_hour.R")
 source("code/modeling/data_prep_updated_other_aggregation.R")
-source("code/modeling/data_prep_updated_day.R")
+#source("code/modeling/data_prep_updated_day.R")
 ls()
 
 unit_flow <- unit_flow_shift
@@ -21,7 +21,7 @@ for(i in units){
 stargazer(inflow_models, title="Results", align=TRUE, type = "latex")
 stargazer(outflow_models, title="Results", align=TRUE, type = "latex")
 rm(list=c("i", "to_model_outflow", "to_model_inflow","units"))
-outflow_models["CCU"]
+outflow_models
 
 # Waiting times curves ====
 waiting_do <- function(unit, unit_flow_data, outflow_models, r = c(0,100), w_max = 3){
@@ -76,7 +76,12 @@ waiting_do <- function(unit, unit_flow_data, outflow_models, r = c(0,100), w_max
     # return all estimated waiting time curves
     return(to_plot[r[1]:r[2],])
 }
-see <- waiting_do("CCU", unit_flow, outflow_models)
-plot(see$ressources, see$waiting_time,type = "l", col="tomato", lwd=2)
-
+par(mfrow=c(3,2))
+for(i in names(unit_flow)){
+    see <- waiting_do(i, unit_flow, outflow_models)
+    plot(see$ressources, see$waiting_time,type = "l", col="tomato", lwd=2, 
+         main=paste("Waiting Curve", i), ylim=c(0,3))
+    
+}
+par(mfrow=c(1,1))
 
