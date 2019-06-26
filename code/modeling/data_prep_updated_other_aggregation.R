@@ -50,6 +50,30 @@ for( time in seq(splits, total_hours, splits)){
   
 }
 shift_selection <- paste0(shift_selection, 'END')
+shift_selection_3 <- "CASE \n"
+pos = 1
+for( time in seq(splits, total_hours, splits)){
+  shift_selection_3 <- paste0(shift_selection_3, "WHEN EXTRACT(HOUR FROM ANY_VALUE(OUTTIME_TRANS_COLLAPSED)) < ")
+  shift_selection_3 <- paste0(shift_selection_3, time)
+  shift_selection_3 <- paste0(shift_selection_3, ' THEN ')
+  shift_selection_3 <- paste0(shift_selection_3, pos)
+  shift_selection_3 <- paste0(shift_selection_3, '\n')
+  pos = pos + 1
+  
+}
+shift_selection_3 <- paste0(shift_selection_3, 'END')
+shift_selection_2 <- "CASE \n"
+pos = 1
+for( time in seq(splits, total_hours, splits)){
+  shift_selection_2 <- paste0(shift_selection_2, "WHEN EXTRACT(HOUR FROM ANY_VALUE(INTIME_TRANS_COLLAPSED)) < ")
+  shift_selection_2 <- paste0(shift_selection_2, time)
+  shift_selection_2 <- paste0(shift_selection_2, ' THEN ')
+  shift_selection_2 <- paste0(shift_selection_2, pos)
+  shift_selection_2 <- paste0(shift_selection_2, '\n')
+  pos = pos + 1
+  
+}
+shift_selection_2 <- paste0(shift_selection_2, 'END')
 
 # build date hour framework ====
 dates_sql <- paste("SELECT 
@@ -62,9 +86,10 @@ units_sql <- paste("SELECT
                    FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_NEW`")
 units <- as.data.frame(dbGetQuery(con, units_sql))$CURR_CAREUNIT
 
-frame <- as.data.frame(rep(seq(as.Date(dates[1,1]),as.Date(dates[1,2]), by="day"), each=(3*6)))
-frame$CHART_SHIFT <- rep(1:3,each=6)
-frame$CURR_UNIT <- rep(units,3)
+frame <- as.data.frame(rep(seq(as.Date(dates[1,1]),as.Date(dates[1,2]), by="day"), 
+                           each=(6 * total_hours / splits )))
+frame$CHART_SHIFT <- rep(1:(total_hours / splits),each=6)
+frame$CURR_UNIT <- rep(units,(total_hours / splits))
 colnames(frame)[1] <- "CHART_DATE"
 
 # Raw Data ====
@@ -88,7 +113,7 @@ SELECT
     CURR_CAREUNIT AS CURR_UNIT,
     IFNULL(ANY_VALUE(PREV_CAREUNIT), ", "'OUT'" , ") AS PREV_CAREUNIT,
     EXTRACT(DATE FROM ANY_VALUE(INTIME_TRANS_COLLAPSED)) AS CHART_DATE,",
-                    shift_selection, " AS CHART_SHIFT
+                    shift_selection_2, " AS CHART_SHIFT
 FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_NEW`
 GROUP BY ICUSTAY_ID, CURR_UNIT
 ORDER BY CHART_DATE, CHART_SHIFT
@@ -102,7 +127,7 @@ FROM
         ICUSTAY_ID,
         CURR_CAREUNIT AS CURR_UNIT, 
         ANY_VALUE(EXTRACT(DATE FROM OUTTIME_TRANS_COLLAPSED)) AS CHART_DATE,",
-                     shift_selection, " AS CHART_SHIFT
+                     shift_selection_3, " AS CHART_SHIFT
     FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_FINAL` 
     GROUP BY ICUSTAY_ID, CURR_UNIT) AS L
 LEFT JOIN 
@@ -110,7 +135,7 @@ LEFT JOIN
         ICUSTAY_ID,
         CURR_CAREUNIT AS NEXT_CAREUNIT, 
         ANY_VALUE(EXTRACT(DATE FROM INTIME_TRANS_COLLAPSED)) AS CHART_DATE,",
-                     shift_selection, " AS CHART_SHIFT
+                     shift_selection_2, " AS CHART_SHIFT
     FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_FINAL` 
     GROUP BY ICUSTAY_ID, NEXT_CAREUNIT) AS R
 USING(ICUSTAY_ID, CHART_DATE, CHART_SHIFT)
@@ -198,5 +223,6 @@ rm(list=c("billing", "con", "detailed_inflow", "detailed_outflow","in_cols",
           "inflow", "inflow_sql", "out_cols", "outflow", "outflow_sql",
           "relabel_cols", "skeleton", "skeleton_sql", "dates_sql", "units",
           "units_sql", "dates", "frame","to_merge", "i", "m", "lagpad", 
-          "flow_data", "unit_flow"))
+          "flow_data", "pos", "shift_selection", "shift_selection_2", "time", 
+          "shift_selection_3", "splits", "total_hours", "unit_flow"))
 
