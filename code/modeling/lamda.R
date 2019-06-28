@@ -18,7 +18,7 @@ con <- dbConnect(
 )
 SKELETON_SQL <- paste("
 SELECT *
-FROM `bgse-dsc.MIMIC3_V1_4.LAMBDA_DATA`
+FROM `bgse-dsc.MIMIC3_V1_4.LAMBDA_DATA_4`
 ORDER BY ICUSTAY_ID, CURR_UNIT, DATE_HOUR
 ")
 # This query take appoximatly 30minutes so it is reccomended that you read in the RDS file
@@ -64,7 +64,10 @@ lambda <- function(data) {
 lambda_data <- lambda_df[, by = .(DATE_HOUR, CURR_UNIT, CHART_SHIFT), 
                          lambda(.SD), .SDcols=c("not_censored", "time"),] %>% 
   rename(lambda = V1,
-         patients = V2) 
+         patients = V2) %>% 
+  mutate(date = as.Date(DATE_HOUR),
+         hour = hour(DATE_HOUR),
+         shift = (hour+4)/4)
 
 head(lambda_data,10)
 
