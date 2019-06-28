@@ -48,28 +48,34 @@ lambda_df <- lambda_df[, time := (OUTTIME_TRANS_COLLAPSED - DATE_HOUR)*(left_cen
                          (OUTTIME_TRANS_COLLAPSED - INTIME_TRANS_COLLAPSED)*(right_censored == 0 & left_censored == 0  & full_censored == 0)
                        ]
 
+data <- lambda_df
 # simple lambda function 
 lambda <- function(data) {
   time <- as.vector((((data$time)/3600)/4))
   not_censored <- as.vector(data$not_censored)
+#  icustay_id <- as.vector(data$ICUSTAY_ID)
+  n = length(not_censored)
   r = sum(not_censored)
   t = sum(time)
   lamda = r/t
+  return(list(lamda, n))
 }
 
-lambda_data <- lambda_df[, by = .(DATE_HOUR, CURR_UNIT),
-                         lambda(.SD), .SDcols=c("not_censored", "time")] %>% 
-  rename(lambda = V1)
+lambda_data <- lambda_df[, by = .(DATE_HOUR, CURR_UNIT, CHART_SHIFT), 
+                         lambda(.SD), .SDcols=c("not_censored", "time"),] %>% 
+  rename(lambda = V1,
+         patients = V2) 
+
+head(lambda_data,10)
 
 table(lambda_df$not_censored)
 table(lambda_df$full_censored)
 table(lambda_df$left_censored)
 table(lambda_df$right_censored)
-
 table(lambda_data$lambda)
 
 # Save data to a file
 saveRDS(lambda_df, file = "code/modeling/lambda_data_final.RDS")
 
-
+sum(lambda_data$lambda == 0)
 
