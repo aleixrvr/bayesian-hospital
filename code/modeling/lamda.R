@@ -57,28 +57,24 @@ lambda <- function(data) {
   n = length(not_censored)
   r = sum(not_censored)
   t = sum(time)
-  lamda = r/t
+  lamda = round(r/t, 5)
   return(list(lamda, n))
 }
 
 lambda_data <- lambda_df[, by = .(DATE_HOUR, CURR_UNIT, CHART_SHIFT), 
                          lambda(.SD), .SDcols=c("not_censored", "time"),] %>% 
-  rename(lambda = V1,
-         patients = V2) %>% 
-  mutate(date = as.Date(DATE_HOUR),
-         hour = hour(DATE_HOUR),
-         shift = (hour+4)/4)
+  rename(LAMBDA = V1,
+         PATIENTS = V2) %>% 
+  mutate(CHART_DATE = as.Date(DATE_HOUR),
+         CHART_HOUR = hour(DATE_HOUR),
+         SHIFT = (CHART_HOUR+4)/4)
 
-head(lambda_data,10)
-
-table(lambda_df$not_censored)
-table(lambda_df$full_censored)
-table(lambda_df$left_censored)
-table(lambda_df$right_censored)
-table(lambda_data$lambda)
-
+lambda_data <- lambda_data %>% 
+  select(CURR_UNIT, CHART_SHIFT, PATIENTS, CHART_DATE) %>% 
+  as.data.table()
 # Save data to a file
-saveRDS(lambda_df, file = "code/modeling/lambda_data_final.RDS")
+#saveRDS(lambda_df, file = "code/modeling/lambda_data_final.RDS")
 
-sum(lambda_data$lambda == 0)
+# write table to BigQuery
+dbWriteTable(con, name = "PATIENTS_DATA", lambda_data, row.names = TRUE, overwrite = TRUE)
 
