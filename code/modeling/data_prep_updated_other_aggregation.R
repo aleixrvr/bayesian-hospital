@@ -38,6 +38,7 @@ con <- dbConnect(
 # Specify shift length ====
 total_hours <- 24
 splits <- 4
+w_max_param <- 2
 shift_selection <- "CASE \n"
 pos = 1
 for( time in seq(splits, total_hours, splits)){
@@ -189,7 +190,7 @@ flow_data <- as.data.table(flow_data)
 # Create relevant features for each dataset ====
 unit_flow <- split(flow_data,by="CURR_UNIT")
 unit_flow <- lapply(unit_flow, function(X){
-  X$waiting_time <- 1 / theta_thres(data.frame(X$OUTFLOW - X$INFLOW), 2)
+  X$waiting_time <- 1 / theta_thres(data.frame(X$OUTFLOW - X$INFLOW), w_max_param)
   X[is.na(X$STAFF),]$waiting_time <- 0
   X$l1_waiting_time <- lagpad(X$waiting_time)
   X$l2_waiting_time <- lagpad(X$waiting_time, 2)

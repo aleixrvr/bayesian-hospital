@@ -46,7 +46,7 @@ rm(list=c("i", "to_model_outflow", "to_model_inflow","units"))
 outflow_models
 
 # Waiting times curves ====
-waiting_do <- function(unit, unit_flow_data, outflow_models, r = c(1,100), w_max = 2){
+waiting_do <- function(unit, unit_flow_data, outflow_models, r = c(1,100), w_max = w_max_param){
     # set units in the ICU to be examined
     do_unit <- unit
     all_units <- names(unit_flow_data)
