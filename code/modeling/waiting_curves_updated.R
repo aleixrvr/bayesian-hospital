@@ -31,8 +31,17 @@ for(i in units){
     outflow_models[[i]] <- lm(OUTFLOW ~ ., to_model_outflow)
 }
 
-# stargazer(inflow_models, title="Results", align=TRUE, type = "latex")
-# stargazer(outflow_models, title="Results", align=TRUE, type = "latex")
+
+stargazer(inflow_models, 
+          title="Inflow Models - Results", 
+          column.labels = paste("Inflow",names(outflow_models)), 
+          align=TRUE, 
+          type = "latex")
+stargazer(outflow_models, 
+          title="Outflow Models - Results", 
+          column.labels = paste("Outflow",names(outflow_models)), 
+          align=TRUE, 
+          type = "latex")
 rm(list=c("i", "to_model_outflow", "to_model_inflow","units"))
 outflow_models
 
@@ -122,34 +131,48 @@ ggplot(to_plot, aes(ressources, waiting_time, group=unit, color=unit)) +
     facet_grid(.~do_unit)
 
 
-colors <- c(I("#9ebcda"), "gray79", "gray54", "gray46", "gray25")
-par(cex.axis=.8, cex.lab=.9, cex.main=1.2)
+
+head(to_plot$waiting_time)
+if(max(to_plot$waiting_time) == 2){
+  to_plot$waiting_time <- to_plot$waiting_time * 4
+}
 units <- as.character(unique(to_plot$unit))
+# colors <- c(I("#9ebcda"), "gray79", "gray54", "gray46", "gray25")
+colors <- c(I("#042B51"), I("#40639E"), I("#9EBCDA"), I("#73B780"), I("#9CD8A7"))
+names(colors) <- units
+par(mfrow=c(3,2), cex.axis=.8, cex.lab=.9, cex.main=1.2)
+
 for(u in units){
     see <- to_plot[to_plot$unit == u,]
     unit_detail <- as.character(unique(see$unit))
     other_units <- as.character(unique(see$do_unit))
     other_units <- other_units[other_units != unit_detail]
     
+    
     plot(see[see$do_unit == unit_detail,"ressources"], 
          see[see$do_unit == unit_detail,"waiting_time"], 
-         col=colors[1], type = "l", lwd=4, 
-         ylab="Waiting Times", las=2, ylim=c(0,2.5),
+         col=colors[unit_detail], type = "l", lwd=2, 
+         ylab="Waiting time in hours", las=2, ylim=c(3,9),
          xlab= "Ressources", frame.plot=FALSE, xaxt="n",
-         main=paste("Change in waiting times in the", unit_detail, "dependent", 
-                    "\n on staff and downstream units")) 
+         #main=paste("Change in waiting times in the", unit_detail, "dependent", 
+         #           "\n on staff and downstream units")) 
+         main=paste(unit_detail))
     axis(1, at=c(0,25,50,75,100))
+    unit_median_staff <- median(unit_flow[[unit_detail]]$STAFF,na.rm = TRUE)
+    abline(v= unit_median_staff, lty=3, lwd=2, col="grey")
+    text(x=unit_median_staff,y=4,"Median",col="grey",cex=.8,pos=2)
     for(i in 1:length(other_units)){
         lines(see[see$do_unit == other_units[i],"ressources"],
               see[see$do_unit == other_units[i],"waiting_time"], 
-              lwd=2, col=colors[2:5][i])
+              lwd=1, col=colors[i])
     }
     lines(see[see$do_unit == unit_detail,"ressources"], 
           see[see$do_unit == unit_detail,"waiting_time"], 
-          col=colors[1], type = "l", lwd=4)
-    legend("bottomleft", c(unit_detail, other_units), col = colors, lwd = 3, cex = .8, bty="n")
+          col=colors[unit_detail], type = "l", lwd=3)
 }
-par(cex.axis=1, cex.lab=1, cex.main=1)
+plot.new()
+legend("center", names(colors), col = colors, lwd = 4, cex = 1, bty="n")
+par(mfrow=c(1,1),cex.axis=1, cex.lab=1, cex.main=1)
 
 
 
