@@ -38,7 +38,7 @@ con <- dbConnect(
 # Specify shift length ====
 total_hours <- 24
 splits <- 4
-w_max_param <- 2
+w_max_param <- 1
 shift_selection <- "CASE \n"
 pos = 1
 for( time in seq(splits, total_hours, splits)){

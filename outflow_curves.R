@@ -130,7 +130,7 @@ for(unit_name in names(unit_flow)){
 
 ggplot(to_plot, aes(ressources, outflow, group=unit, color=unit)) +
   geom_line() +
-  facet_grid(.~do_unit)
+  facet_grid(.~do_unit, scales = 'free_x')
 
 
 # 
