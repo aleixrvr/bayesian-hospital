@@ -94,11 +94,13 @@ ORDER BY CHART_DATE, CHART_SHIFT
 ")
 staff <- dbGetQuery(con, staff_sql)
 staff <- as.data.table(staff)
+staff[is.na(DESCRIPTION), DESCRIPTION := 'Unknown']
 staff <- staff[,.("Nurse"=sum(DESCRIPTION=="RN"),
                   "Respiratory"=sum(DESCRIPTION=="Respiratory"),
                   "IMD"=sum(DESCRIPTION=="IMD"),
                   "PCT_NA"=sum(DESCRIPTION=="PCT/NA"),
                   "Resident"=sum(DESCRIPTION=="Resident/Fellow/PA/NP"),
+                  "Unknown"=sum(DESCRIPTION=="Unknown"),
                   "Others"=sum(DESCRIPTION %in% c("Pharmacist", "UCO", "Case Manager", 
                                                   "Pastoral Care", "Social Worker",
                                                   "Attending", "Rehabilitation", 
@@ -206,5 +208,5 @@ flow_data <- flow_data[flow_data$CURR_UNIT != "NICU",]
 flow_data %>% select(-contains('NICU')) %>% select(-contains('NWARD')) -> flow_data
 
 # Save clean dataset ====
-save(flow_data, file="data/clean_dataset.RData")
+save(flow_data, file="release/data/clean_dataset.RData")
 
