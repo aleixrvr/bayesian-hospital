@@ -97,7 +97,7 @@ staff <- as.data.table(staff)
 staff <- staff[,.("Nurse"=sum(DESCRIPTION=="RN"),
                   "Respiratory"=sum(DESCRIPTION=="Respiratory"),
                   "IMD"=sum(DESCRIPTION=="IMD"),
-                  "PCT/NA"=sum(DESCRIPTION=="PCT/NA"),
+                  "PCT_NA"=sum(DESCRIPTION=="PCT/NA"),
                   "Resident"=sum(DESCRIPTION=="Resident/Fellow/PA/NP"),
                   "Others"=sum(DESCRIPTION %in% c("Pharmacist", "UCO", "Case Manager", 
                                                   "Pastoral Care", "Social Worker",
@@ -106,6 +106,8 @@ staff <- staff[,.("Nurse"=sum(DESCRIPTION=="RN"),
                                                   "Dietitian"))
                   ), 
                by=list(CHART_DATE, CHART_SHIFT,CURR_UNIT)]
+colnames(staff) <- c(colnames(staff)[1:3], paste0("STAFF_", colnames(staff)
+                                                  [4:length(colnames(staff))]))
 
 # Inflow data ====
 inflow_sql <- paste("
@@ -188,14 +190,20 @@ in_cols <- c("from_OUT", "from_NWARD", "from_NICU", "from_MICU",
              "from_TSICU", "from_CSRU", "from_SICU", "from_CCU")
 out_cols <- c("to_OUT", "to_NWARD", "to_NICU", "to_MICU", "to_TSICU",
               "to_CSRU", "to_SICU", "to_CCU")
-staff_cols <- c("Nurse", "Respiratory", "IMD", "PCT/NA", "Resident", "Others")
+staff_cols <- c("STAFF_Nurse", "STAFF_Respiratory", "STAFF_IMD", "STAFF_PCT_NA", 
+                "STAFF_Resident", "STAFF_Others")
 relabel_cols <- c(in_cols, out_cols, staff_cols)
 flow_data <- as.data.frame(flow_data)
 flow_data[relabel_cols][is.na(flow_data[relabel_cols])] <- 0 
 flow_data["INFLOW"] <- rowSums(flow_data[in_cols])
 flow_data["OUTFLOW"] <- rowSums(flow_data[out_cols])
-flow_data["STAFF"] <- rowSums(flow_data[staff_cols])
+flow_data["STAFF_TOTAL"] <- rowSums(flow_data[staff_cols])
 flow_data <- as.data.table(flow_data)
+
+# Deleting NICU and NWARD ====
+see <- flow_data
+flow_data <- flow_data[flow_data$CURR_UNIT != "NICU",]
+flow_data %>% select(-contains('NICU')) %>% select(-contains('NWARD')) -> flow_data
 
 # Save clean dataset ====
 save(flow_data, file="data/clean_dataset.RData")
