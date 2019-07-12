@@ -9,12 +9,14 @@ theta_thres <- function(net_flow, w_max){
   apply(net_flow, 1, function(x) max(x,(1/w_max)))
 }
 
-prepare_data <- function(unit_flow, w_max){
+prepare_data <- function(unit_flow, staff_type = 'TOTAL', w_max){
   unit_flow <- lapply(unit_flow, function(X){
     X <- as.data.frame(X)
+    staff_column <- paste('STAFF', staff_type, sep='_')
     
-    X$STAFF <- X[, 'STAFF_TOTAL']
+    X$STAFF <- X[,staff_column]
     X$STAFF_TOTAL <- NULL
+    X[[staff_column]] <- NULL
     X$waiting_time <- 1 / theta_thres(data.frame(X$OUTFLOW - X$INFLOW), w_max)
     X$l1_waiting_time <- lagpad(X$waiting_time)
     X$l2_waiting_time <- lagpad(X$waiting_time, 2)

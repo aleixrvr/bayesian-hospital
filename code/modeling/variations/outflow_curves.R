@@ -135,17 +135,17 @@ predict_outflow_main <- function(unit_name, pred_data, pred_waiting, resources=N
   return( mean(pred_outflow) )
 }
 
-outflow_do <- function(unit_name, unit_flow_data, outflow_models, r = c(-20,20), w_max = w_max){
+outflow_do <- function(unit_name, unit_flow, outflow_models, r = c(1,110), w_max = w_max){
   # set units in the ICU to be examined
   do_unit <- unit_name
-  all_units <- names(unit_flow_data)
+  all_units <- names(unit_flow)
   units <- all_units[all_units != unit_name]
   
   sel_resources = unique(pmax(median(unit_flow[[unit_name]]$STAFF,na.rm = TRUE) + r, 0))
   sel_resources = sel_resources[1]:sel_resources[2]
   
   # prepare data for the selected unit_name
-  unit_flow_data[[unit_name]] %>% 
+  unit_flow[[unit_name]] %>% 
     as.data.table() -> pred_data
   pred_data <- pred_data[complete.cases(pred_data)]
   
