@@ -90,7 +90,7 @@ predict_outflow_main <- function(unit_name, pred_data, pred_waiting, resources=N
   return( mean(pred_outflow) )
 }
 
-outflow_do <- function(unit_name, unit_flow, outflow_models, staff_lags, sel_resources = c(1,60), w_max = w_max){
+outflow_do <- function(unit_name, unit_flow, outflow_models, staff_lags, sel_resources = c(1,150), w_max = w_max){
   staff_lags_name <- paste0('l_STAFF_', 1:staff_lags)
   staff_lags_name_main <- staff_lags_name[1:length(staff_lags_name) -1 ]
   staff_lags_lagged <- staff_lags_name[1:length(staff_lags_name)]
