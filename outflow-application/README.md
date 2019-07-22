@@ -1,6 +1,6 @@
 # Baysesian Hospital - Outflow Application (UI)
 
-This folder contains a [Shiny App](https://rstudio.github.io/shinydashboard/) to interact with the empirical model. The model illustrates the effect of a chosen resource policy on the intensive care units outflow and recommends the best unit to apply given resource policy.
+This folder contains a [Shiny App](https://rstudio.github.io/shinydashboard/) to interact with the empirical model. The model illustrates the effect of a chosen resource policy on the intensive care units outflow and recommends the best unit to apply the given resource policy.
 
 To run the application, follow the steps below:
 
