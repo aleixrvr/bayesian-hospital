@@ -2,6 +2,7 @@
 library(ggplot2)
 library(magrittr)
 library(stargazer)
+library(data.table)
 
 source('release/prepare_data.R')
 source('release/outflow_curves.R')
@@ -63,7 +64,7 @@ stargazer(outflow_models,
           title="Outflow Models - Results",
           column.labels = paste("Outflow",names(outflow_models)),
           align=TRUE,
-          type = "text")
+          type = "latex")
 
 
 saveRDS(results_table, 'release/model/do_unit.RDS')
