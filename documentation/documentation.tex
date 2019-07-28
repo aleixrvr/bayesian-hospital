@@ -1,0 +1,105 @@
+
+
+
+\documentclass[12pt]{article}
+
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{pgf}
+\usepackage{tikz}
+\usepackage{dcolumn}
+\usetikzlibrary{arrows,automata}
+\usepackage[latin1]{inputenc}
+
+\usepackage[round]{natbib}
+\definecolor{ashgrey}{rgb}{0.7, 0.75, 0.71}
+
+\def\bibsection{\section{References}}
+
+\hfuzz=25pt
+\parskip=12pt
+\pagestyle{empty}
+
+\setlength{\textwidth}{6.5in}
+\setlength{\textheight}{8.8in}
+\setlength{\oddsidemargin}{0in}
+\setlength{\topmargin}{-0.5in}
+\setlength{\jot}{0.3cm}
+
+\usepackage{hyperref,graphicx,textcomp,color,enumitem,tikz}
+\usetikzlibrary{shapes.geometric, arrows}
+\newcommand\school{UPF}
+
+\newcommand\opc[1]{{\color{red}#1}}
+
+\begin{document}
+
+\def\moveover{\hskip 4.2 true in}
+
+
+
+
+
+%\vfill
+\bigskip
+% \settabs 3 \columns
+
+%\moveover \today.\hfil\break
+\bigskip
+
+
+\title{Bayesian Hospital - Documentation}
+
+\date{}
+
+\maketitle
+
+\subsection*{Team}
+
+Barcelona GSE Data Science Center
+Omiros Papaspiliopoulos, Aleix Ruiz de Villa, Reid Falconer, Max Zebhauser and Nandan Rao
+
+\subsection*{Platform}
+
+We have used BigQuery from Google Cloud Platform to manage and process MIMIC's data. Some links that may be useful
+
+\begin{itemize}
+	\item MIMIC's documentation: https://mimic.physionet.org/
+	\item MIMIC's databse schema https://mit-lcp.github.io/mimic-schema-spy/
+	\item Code repository: https://github.com/MIT-LCP/mimic-code
+	\item Visualization tool: http://hdsl.uwaterloo.ca/visualization-tool/
+\end{itemize}
+
+\subsection*{Uploading data to Big Query}
+
+The best way to upload data si following step by step the tutorial from MIMIC' github repository 
+https://github.com/MIT-LCP/mimic-code/tree/master/buildmimic/bigquery
+
+\subsection*{Connect to BigQuery via R}
+
+For this you can use the 'BQ connection example.R' file. First time you use it, it asks you for your google authorization and saves a file in your disk to remember it. \textbf{Note}: If you use any type of code repository, be careful to ignore this file, otherwise you will upload your credentials to your repository.
+
+\subsection*{Build Tables}
+
+
+%TODO Reid
+
+\subsection*{Data Exploration App}
+
+For running this Shiny App, you just need to open and run the RStudio project in the folder 'exploration-app'.
+
+\subsection*{Model Building}
+
+For building the models that will be later on used by the outflow-app, open the bayesian-hospital RStudio project in the main folder and then execute:
+
+\begin{itemize}
+	\item 'model-building/data/final-data-retrieval.R' to save summarized data locally 
+	\item 'model-building/build\_model.R' to build and save the models in 'model-building/model/'
+\end{itemize} 
+
+
+\subsection*{Outflow App}
+
+%TODO Reid
+
+\end{document}

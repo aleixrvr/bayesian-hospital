@@ -224,5 +224,5 @@ flow_data <- flow_data[flow_data$CURR_UNIT != "NICU",]
 flow_data %>% select(-contains('NICU')) %>% select(-contains('NWARD')) -> flow_data
 
 # Save clean dataset ====
-save(flow_data, file="release/data/clean_dataset.RData")
+save(flow_data, file="model-building/data/clean_dataset.RData")
 

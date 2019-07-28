@@ -4,7 +4,7 @@ This folder contains a [Shiny App](https://rstudio.github.io/shinydashboard/) to
 
 To run the application, follow the steps below:
 
-1. Make sure you have [R](https://cran.r-project.org/doc/manuals/r-release/R-admin.html) installed *(a pretty important step in this process)*
+1. Make sure you have [R](https://cran.r-project.org/doc/manuals/r-release/R-admin.html) installed *(a pretty important step in this process)* and [RStudio](https://www.rstudio.com/products/rstudio/download/)
 
 2. Through your favourite R interface, be sure you `install.packages` for both shiny and shinydashboard along with all the packages found in the `global.R` script. This process has been automated in the `global.R` script but should be validated.
 

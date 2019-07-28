@@ -4,11 +4,11 @@ library(magrittr)
 library(stargazer)
 library(data.table)
 
-source('release/prepare_data.R')
-source('release/outflow_curves.R')
+source('model-building/prepare_data.R')
+source('model-building/outflow_curves.R')
 
 # Model data ====
-load("release/data/clean_dataset.RData")
+load("model-building/data/clean_dataset.RData")
 
 # Settings ====
 unit_flow <- split(flow_data,by="CURR_UNIT")
@@ -48,24 +48,24 @@ for( shift_num in shift_types ){
   
 
 # Visual Checks
-results_table <- data.table(results_table)
-plots <- list()
-for( shift_num_iter in shift_types ){
-  results_table[shift_num==shift_num_iter] %>%
-    ggplot(aes(resources, outflow, group=unit_name, color=unit_name)) +
-    geom_line() +
-    facet_grid(.~do_unit)+
-    ggtitle(paste0('Shift:', shift_num_iter)) ->
-    plots[[shift_num_iter]]
-}
-sapply(plots, plot)
+# results_table <- data.table(results_table)
+# plots <- list()
+# for( shift_num_iter in shift_types ){
+#   results_table[shift_num==shift_num_iter] %>%
+#     ggplot(aes(resources, outflow, group=unit_name, color=unit_name)) +
+#     geom_line() +
+#     facet_grid(.~do_unit)+
+#     ggtitle(paste0('Shift:', shift_num_iter)) ->
+#     plots[[shift_num_iter]]
+# }
+# sapply(plots, plot)
+# 
+# stargazer(outflow_models,
+#           title="Outflow Models - Results",
+#           column.labels = paste("Outflow",names(outflow_models)),
+#           align=TRUE,
+#           type = "latex")
 
-stargazer(outflow_models,
-          title="Outflow Models - Results",
-          column.labels = paste("Outflow",names(outflow_models)),
-          align=TRUE,
-          type = "latex")
 
-
-saveRDS(results_table, 'release/model/do_unit.RDS')
-saveRDS(median_stats, 'release/model/median_stats.RDS')
+saveRDS(results_table, 'model-building/model/do_unit.RDS')
+saveRDS(median_stats, 'model-building/model/median_stats.RDS')
