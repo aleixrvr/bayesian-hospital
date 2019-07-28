@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930) (preloaded format=pdflatex 2019.1.18)  28 JUL 2019 13:01
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930) (preloaded format=pdflatex 2019.1.18)  28 JUL 2019 14:45
 entering extended mode
 **./documentation.tex
 (documentation.tex
@@ -921,14 +921,14 @@ LaTeX Warning: No \author given.
 
 {/Users/aleixrvr/Library/Application Support/MiKTeX/texmfs/data/pdftex/config/p
 dftex.map}] [2]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 105.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 105.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 107.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 107.
  (documentation.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 105.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 105.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 107.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 107.
 Package rerunfilecheck Info: File `documentation.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 105.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 107.
  ) 
 Here is how much of TeX's memory you used:
  18491 strings out of 494865
@@ -944,7 +944,7 @@ our/jknappen/ec/dpi600/tcrm1200.pk></Users/aleixrvr/Library/Application Support
 vr/Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfont
 s/cm/cmr12.pfb></Users/aleixrvr/Library/Application Support/MiKTeX/texmfs/insta
 ll/fonts/type1/public/amsfonts/cm/cmr17.pfb>
-Output written on documentation.pdf (2 pages, 49254 bytes).
+Output written on documentation.pdf (2 pages, 50306 bytes).
 PDF statistics:
  45 PDF objects out of 1000 (max. 8388607)
  11 named destinations out of 1000 (max. 500000)

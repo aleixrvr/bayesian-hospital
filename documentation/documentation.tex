@@ -75,9 +75,11 @@ We have used BigQuery from Google Cloud Platform to manage and process MIMIC's d
 The best way to upload data si following step by step the tutorial from MIMIC' github repository 
 https://github.com/MIT-LCP/mimic-code/tree/master/buildmimic/bigquery
 
+\textbf{Important}: Call your BQ Dataset \textbf{MIMIC3\_V1\_4} so that the rest of the scripts are compatible.
+
 \subsection*{Connect to BigQuery via R}
 
-For this you can use the 'BQ connection example.R' file. First time you use it, it asks you for your google authorization and saves a file in your disk to remember it. \textbf{Note}: If you use any type of code repository, be careful to ignore this file, otherwise you will upload your credentials to your repository.
+For this you can use the 'BQ connection example.R' file. First time you use it, it asks you for your google authorization and saves a file in your disk to remember it. \textbf{Note}: If you use any type of code repository, be careful to ignore this file, otherwise you will upload your credentials to your repository. 
 
 \subsection*{Build Tables}
 
