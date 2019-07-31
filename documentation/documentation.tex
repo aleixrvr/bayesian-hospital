@@ -68,7 +68,7 @@ In order to build the required tables for the modelling process and applications
 \begin{enumerate}
 	\item  Run the `build-bq-tables/shifting\_stability.R' script. This will create a table called ICUSTAYS\_TRANS\_COLLAPSED in BigQuery Dataset (MIMIC3\_V1\_4).
 	\item Execute the `build-bq-tables/join\_depts.sql' query in BigQuery. This step (along with steps 3, 4 and 5) require you to set a destination table for the query results. Call your BQ table CHARTEVENTS\_DEPTS.
-	\item  Execute the `build-bq-tables/merge\_categories.sql' query in BigQuery. Call your BQ table \\ CHARTEVENTS\_DEPTS\_CATS.
+	\item  Execute the `build-bq-tables/merge\_categories.sql' query in BigQuery. Call your BQ table CHARTEVENTS\_DEPTS\_CATS.
 	\item  Execute the `build-bq-tables/chart\_time\_collapsing.sql'  query in BigQuery. Call your BQ table CHARTEVENTS\_DEPTS\_CATS\_TS\_COLLAPSED.
 	\item  Run the `build-bq-tables/chart\_time\_collapsing\_final.sql' query in BigQuery. Call your BQ table CHARTEVENTS\_DEPTS\_CATS\_TS\_COLLAPSED\_FINAL.
 \end{enumerate} 
@@ -76,7 +76,7 @@ In order to build the required tables for the modelling process and applications
 
 \subsection*{Data Exploration App}
 
-For running this Shiny App, you just need to open and run the RStudio project in the folder `exploration-app'.
+For running this Shiny App, you just need to open and run the RStudio project (`app.Rproj') in the folder `exploration-app'.
 
 \subsection*{Model Building}
 
@@ -90,7 +90,7 @@ For building the models that will be later on used by the outflow-app, open the 
 
 \subsection*{Outflow App}
 
-To run the application, one needs to open and run the RStudio project in the folder `outflow-app;' (precise instructions are provided in `outflow-app/README.md`). The application illustrates the effect of a chosen resource policy on the intensive care units outflow and recommends the best unit on which to apply the resource policy selected (along with its economic impact)\footnote{The economic effect is simply the net outflow multiplied by \euro10 000. This can be easily modified in the `outflow-app/global.R' script (line 19). }. 
+To run the application, one needs to open and run the RStudio project in the folder `outflow-app' (precise instructions are provided in `outflow-app/README.md`). The application illustrates the effect of a chosen resource policy on the intensive care units outflow and recommends the best unit on which to apply the resource policy selected (along with its economic impact)\footnote{The economic effect is simply the net outflow multiplied by \euro10 000. This can be easily modified in the `outflow-app/global.R' script (line 19). }. 
 
 \subsubsection*{Application Tutorial}
 
