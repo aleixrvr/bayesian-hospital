@@ -23,4 +23,4 @@ To run the application, follow the steps below:
 ![rshiny-detail_3](screenshots/detail_3.png)
 ![rshiny-detail_4](screenshots/detail_4.png)
 ![rshiny-detail_5](screenshots/detail_5.png)
-At this current point in time the net economic effect is simply the net outflow multiplied by €10 000. Nonetheless, this can be easily modified in the `server.R` scripyt (line 431). 
+At this current point in time the net economic effect is simply the net outflow multiplied by €10 000. This can be easily modified in the `server.R` scripyt (line 431). 
