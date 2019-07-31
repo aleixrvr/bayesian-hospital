@@ -64,11 +64,11 @@ shift_selection_3 <- paste0(shift_selection_3, "END")
 dates_sql <- paste("SELECT 
                         MIN(EXTRACT(DATE FROM CHARTTIME_COLLAPSED)) AS min_date, 
                         MAX(EXTRACT(DATE FROM CHARTTIME_COLLAPSED)) AS max_date
-                   FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_NEW`")
+                   FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_FINAL`")
 dates <- as.data.frame(dbGetQuery(con, dates_sql))
 units_sql <- paste("SELECT 
                         DISTINCT CURR_CAREUNIT
-                   FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_NEW`")
+                   FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_FINAL`")
 units <- as.data.frame(dbGetQuery(con, units_sql))$CURR_CAREUNIT
 
 frame <- as.data.frame(rep(seq(as.Date(dates[1,1]),as.Date(dates[1,2]), by="day"), 
@@ -85,7 +85,7 @@ SELECT
                       shift_selection, "AS CHART_SHIFT,
     CURR_CAREUNIT AS CURR_UNIT, 
     CGID
-FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_NEW`
+FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_FINAL`
 GROUP BY CHART_DATE, CHART_SHIFT, CURR_UNIT, CGID) AS L 
 LEFT JOIN (
 SELECT CGID, DESCRIPTION FROM `MIMIC3_V1_4.CAREGIVERS` ) AS R
@@ -120,7 +120,7 @@ SELECT
                       CURR_CAREUNIT AS CURR_UNIT, 
                       COUNT(DISTINCT CGID) AS STAFF,
                       AVG(LOS_TRANS) AS AVG_LOS
-                      FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_NEW`
+                      FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_FINAL`
                       GROUP BY CHART_DATE, CHART_SHIFT, CURR_UNIT
                       ORDER BY CHART_DATE, CHART_SHIFT
                       ")
@@ -135,7 +135,7 @@ SELECT
     IFNULL(ANY_VALUE(PREV_CAREUNIT), ", "'OUT'" , ") AS PREV_CAREUNIT,
     EXTRACT(DATE FROM ANY_VALUE(INTIME_TRANS_COLLAPSED)) AS CHART_DATE,",
                     shift_selection_2, " AS CHART_SHIFT
-FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_NEW`
+FROM `MIMIC3_V1_4.CHARTEVENTS_DEPTS_CATS_TS_COLLAPSED_FINAL`
 GROUP BY ICUSTAY_ID, CURR_UNIT
 ORDER BY CHART_DATE, CHART_SHIFT
 ")
