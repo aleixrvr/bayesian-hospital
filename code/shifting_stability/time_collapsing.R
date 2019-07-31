@@ -38,14 +38,6 @@ con <- dbConnect(
 )
 dbListTables(con)
 
-# If the date shift filter is on, deid replaces all dates in its input with 
-# surrogate dates. The shift.txt file contains a 
-# randomly assigned date shift (between 1000 and 3000 days) 
-
-# SQL QUERY ====
-
-# see `shifting_stability.sql`
-
 # TIME SHIFT GENERATION ====
 
 sql <- paste0("
@@ -139,19 +131,13 @@ collapse_times <- function(source = "metavision") {
   }
   return(df_collapsed)
 }
-  
-?as.difftime
+
 carvue <- collapse_times(source = "carevue")
 metavision <- collapse_times(source = "metavision")
 #all <- collapse_times(source = "all")
-# nrow(carvue) + nrow(metavision)
-# nrow(all)
 
 df_collapsed <- rbind(carvue, metavision) %>% 
   select(-c(starts_with("OUTTIME_SHIFT"), LOS_TRANS_ACCURATE))
  
-
-glimpse(df_collapsed)
-
 # write table to BigQuery
 dbWriteTable(con, name = "ICUSTAYS_TRANS_COLLAPSED", df_collapsed, row.names = TRUE, overwrite = TRUE)
