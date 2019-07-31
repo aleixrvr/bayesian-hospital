@@ -66,11 +66,11 @@ For this you can use the 'BQ connection example.R' file. First time you use it, 
 
 In order to build the required tables for the modelling process and applications follow the steps outlined below: 
 \begin{enumerate}
-	\item  Run the `build-bq-scripts/shifting\_stability.R' script. This will create a table called ICUSTAYS\_TRANS\_COLLAPSED in BigQuery Dataset (MIMIC3\_V1\_4).
-	\item Execute the `build-bq-scripts/join\_depts.sql' query in BigQuery. This step (along with steps 3, 4 and 5) require you to set a destination table for the query results. Call your BQ table CHARTEVENTS\_DEPTS.
-	\item  Execute the `build-bq-scripts/merge\_categories.sql' query in BigQuery. Call your BQ table \\ CHARTEVENTS\_DEPTS\_CATS.
-	\item  Execute the `build-bq-scripts/chart\_time\_collapsing.sql'  query in BigQuery. Call your BQ table CHARTEVENTS\_DEPTS\_CATS\_TS\_COLLAPSED.
-	\item  Run the `build-bq-scripts/chart\_time\_collapsing\_final.sql' query in BigQuery. Call your BQ table CHARTEVENTS\_DEPTS\_CATS\_TS\_COLLAPSED\_FINAL.
+	\item  Run the `build-bq-tables/shifting\_stability.R' script. This will create a table called ICUSTAYS\_TRANS\_COLLAPSED in BigQuery Dataset (MIMIC3\_V1\_4).
+	\item Execute the `build-bq-tables/join\_depts.sql' query in BigQuery. This step (along with steps 3, 4 and 5) require you to set a destination table for the query results. Call your BQ table CHARTEVENTS\_DEPTS.
+	\item  Execute the `build-bq-tables/merge\_categories.sql' query in BigQuery. Call your BQ table \\ CHARTEVENTS\_DEPTS\_CATS.
+	\item  Execute the `build-bq-tables/chart\_time\_collapsing.sql'  query in BigQuery. Call your BQ table CHARTEVENTS\_DEPTS\_CATS\_TS\_COLLAPSED.
+	\item  Run the `build-bq-tables/chart\_time\_collapsing\_final.sql' query in BigQuery. Call your BQ table CHARTEVENTS\_DEPTS\_CATS\_TS\_COLLAPSED\_FINAL.
 \end{enumerate} 
 
 
