@@ -101,8 +101,6 @@ server <- function(input, output, session) {
     unit_components$Unit <- levels(unit_components$do_unit)
     unit_components$type <-
       ifelse(unit_components$out_inc < 0, "below", "above")
-    # unit_components <-
-    #  unit_components[order(unit_components$out_inc),]  # sort
     unit_components$Unit <-
       factor(unit_components$Unit, levels = unit_components$Unit)
     
@@ -427,7 +425,8 @@ server <- function(input, output, session) {
     base_hospital_reccomendation <- base_hospital_reccomendation()
     color <- 'yellow'
     infoBox(
-      subtitle = ifelse(base_hospital_reccomendation[[1]] == "CCU", "", paste(base_hospital_reccomendation[[1]],"( €",round(base_hospital_reccomendation[[2]]*10000, 2),")")),
+      subtitle = ifelse(base_hospital_reccomendation[[1]] == "CCU", "", 
+                        paste(base_hospital_reccomendation[[1]],"( €",round(base_hospital_reccomendation[[2]]*economic_value, 2),")")),
       color = color,
       title = "Recommendation",
       icon = icon("thumbs-up")

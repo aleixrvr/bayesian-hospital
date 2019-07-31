@@ -30,8 +30,7 @@ ui <- dashboardPage(
         "12:00 - 16:00" = 4,
         "16:00 - 20:00" = 5,
         "20:00 - 24:00" = 6
-      )#,
-     # selectize = TRUE
+      )
     ),
     sidebarMenu(
       sliderInput(
@@ -42,17 +41,9 @@ ui <- dashboardPage(
         max = 10,
         value = 2
       ),
-      # Copy the line below to make a number input box into the UI.
-      # numericInput("resource_ccu", label = h4("CCU Resources"), value = 22, min = 20, max = 40),
-      # numericInput("resource_micu", label = h4("MICU Resources"), value = 57),
-      # numericInput("resource_sicu", label = h4("SICU Resources"), value = 36),
-      # numericInput("resource_tsicu", label = h4("TSICU Resources"), value = 26),
-      # numericInput("resource_csru", label = h4("CSRU Resources"), value = 25),
       br(),
-      infoBoxOutput("reccomendation",width = 12)#,
-    #  infoBoxOutput("economic",width = 12)
-      #helpText("Copyright @ 2019 Accenture. All rights reserved.")
-     # menuItem(img(src='img/bh_icon.png', width = "290", height = "300", posistion = "center")),
+      br(),
+      infoBoxOutput("reccomendation",width = 12)
     )
   ),
   # Body ====
@@ -61,28 +52,12 @@ ui <- dashboardPage(
     box(width = 5,
      # title = "ICU Optimizer",
       id = "tabs_1",# title = "Units",
-      #  fluidRow(valueBoxOutput("reccomendation",width = 12)),
      (valueBoxOutput("net_sicu", width = 12)),
      (valueBoxOutput("net_csru", width = 12)),
      (valueBoxOutput("net_micu", width = 12)),
      (valueBoxOutput("net_ccu", width = 12)),
      (valueBoxOutput("net_tsicu", width = 12))
     ),
-    # box(
-    #   width = 8,
-    #   title = "Outflow Breakdown",
-    #   id = "tabs_1",
-    #   selectInput(
-    #     inputId = "unit_name",
-    #     label = "Effect Of Resource Policy On:",
-    #     choices = list("CSRU",
-    #                    "CCU",
-    #                    "SICU",
-    #                    "TSICU",
-    #                    "MICU"),
-    #     selectize = TRUE
-    #   )
-    # ),
     box(#title = "Outflow Per Unit",
       width = 7,
       plotOutput("outflow_breakdown", height = "88vh")

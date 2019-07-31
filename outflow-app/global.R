@@ -15,9 +15,12 @@ pkgTest("shinyBS")
 pkgTest("shinydashboard")
 pkgTest("ggplot2")
 
+# Economic Impact (line 431 in server.R script)
+economic_value <- 10000
+
 # load data ====
-results_table <- readRDS('release/model/do_unit.RDS')
-median_stats <- readRDS('release/model/median_stats.RDS')
+results_table <- readRDS('../model-building/model/do_unit.RDS')
+median_stats <- readRDS('../model-building/model/median_stats.RDS')
 
 get_shift_types <- function(){
   results_table[, unique(shift_num)]
