@@ -48,7 +48,7 @@ For building the models that will be later on used by the outflow-app, open the 
 
 # Outflow App
 
-To run the application, one needs to open and run the RStudio project (`outflow_app.Rproj`) in the folder `outflow-app` (precise instructions are provided in `outflow-app/README.md`). The application illustrates the effect of a chosen resource policy on the intensive care units outflow and recommends the best unit on which to apply the resource policy selected (along with its economic impact)
+To run the application, one needs to open and run the RStudio project (`outflow_app.Rproj`) in the folder `outflow-app` (precise instructions are provided in `outflow-app/README.md`). The application illustrates the effect of a chosen resource policy on the intensive care units outflow and recommends the best unit on which to apply the resource policy selected (along with its economic impact).
 
 ## Application Tutorial
 
