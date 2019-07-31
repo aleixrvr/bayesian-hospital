@@ -91,7 +91,7 @@ server <- function(input, output, session) {
     url_hash <- getUrlHash()
     url_hash_sub <- (substr(url_hash, 2, 1000000))
     qs <- parseQueryString(url_hash_sub)
-
+    
     unit_components <- do_unit(
       ifelse(is.null(qs$unit), "SICU", qs$unit)  ,
       resources_sel_inc = input$resources,
@@ -101,7 +101,7 @@ server <- function(input, output, session) {
     unit_components$Unit <- levels(unit_components$do_unit)
     unit_components$type <-
       ifelse(unit_components$out_inc < 0, "below", "above")
-   # unit_components <-
+    # unit_components <-
     #  unit_components[order(unit_components$out_inc),]  # sort
     unit_components$Unit <-
       factor(unit_components$Unit, levels = unit_components$Unit)
@@ -161,7 +161,7 @@ server <- function(input, output, session) {
       color <- 'yellow'
     if (as.character(hospital_plot_df()[which.max(abs(hospital_plot_df()$out_inc)), ][[1]]) == "CCU")
       color <- 'aqua'
-  
+    
     icon_ccu <- icon("heartbeat")
     if (base_hospital_reccomendation[[1]] == "CCU")
       icon_ccu <- icon("heartbeat")
@@ -186,8 +186,10 @@ server <- function(input, output, session) {
     
     if (is.na(base_hospital_ccu[[2]][1])) subtitle_ccu <- "Resource Limit"
     
+    resources <- base_hospital_micu()$resources[2]
+    
     valueBox(
-      value = "CCU",
+      value = paste0("CCU (",resources,")"),
       icon = icon_ccu,
       color = color,
       subtitle = subtitle_ccu,
@@ -239,9 +241,11 @@ server <- function(input, output, session) {
     
     if (is.na(base_hospital_sicu[[2]][1])) subtitle_sicu <- "Resource Limit"
     
+    
+    resources <- base_hospital_micu()$resources[5]
+    
     valueBox(
-      value = "SICU"
-      ,
+      value = paste0("SICU (",resources,")"),
       icon = icon_sicu,
       color = color,
       subtitle = subtitle_sicu,
@@ -292,8 +296,10 @@ server <- function(input, output, session) {
     
     if (is.na(base_hospital_micu[[2]][1])) subtitle_micu <- "Resource Limit"
     
+    resources <- base_hospital_micu()$resources[3]
+    
     valueBox(
-      value = "MICU",
+      value = paste0("MICU (",resources,")"),
       icon = icon_micu,
       color = color,
       subtitle = subtitle_micu,
@@ -345,8 +351,10 @@ server <- function(input, output, session) {
     
     if (is.na(base_hospital_csru[[2]][1])) subtitle_csru <- "Resource Limit"
     
+    resources <- base_hospital_micu()$resources[4]
+    
     valueBox(
-      value = "CSRU",
+      value = paste0("CSRU (",resources,")"),
       icon = icon_csru,
       color = color,
       subtitle = subtitle_csru,
@@ -402,8 +410,10 @@ server <- function(input, output, session) {
     
     if (is.na(base_hospital_tsicu[[2]][1])) subtitle_tsicu <- "Resource Limit"
     
+    resources <- base_hospital_micu()$resources[1]
+    
     valueBox(
-      value = "TSICU",
+      value = paste0("TSICU (",resources,")"),
       icon = icon_tsicu,
       color = color,
       subtitle = subtitle_tsicu,
@@ -411,18 +421,30 @@ server <- function(input, output, session) {
     )
   })
   
-
+  
   # Reccomendation ValueBox ====
   output$reccomendation <- renderValueBox({
     base_hospital_reccomendation <- base_hospital_reccomendation()
     color <- 'yellow'
     infoBox(
-      subtitle = ifelse(base_hospital_reccomendation[[1]] == "CCU", "",  paste0(base_hospital_reccomendation[[1]])),
+      subtitle = ifelse(base_hospital_reccomendation[[1]] == "CCU", "", paste(base_hospital_reccomendation[[1]],"( €",round(base_hospital_reccomendation[[2]]*10000, 2),")")),
       color = color,
       title = "Recommendation",
       icon = icon("thumbs-up")
     )
   })
+  
+  # # Economic ValueBox ====
+  # output$economic <- renderValueBox({
+  #   base_hospital_reccomendation <- base_hospital_reccomendation()
+  #   color <- 'yellow'
+  #   infoBox(
+  #     subtitle = ifelse(base_hospital_reccomendation[[1]] == "CCU", "",  paste0("€",round(base_hospital_reccomendation[[2]]*100))),
+  #     color = color,
+  #     title = "Economic Impact",
+  #     icon = icon("money-bill-wave")
+  #   )
+  # })
   
   # Render Plot ====
   output$outflow_breakdown <- renderPlot({
@@ -434,7 +456,7 @@ server <- function(input, output, session) {
         labels = c("Positive", "Negative"),
         values = c("above" = "#00A65A", "below" = "#DD4B39")
       ) +
-  #    ggtitle(paste0(as.character(hospital_plot_df()[which.max(abs(hospital_plot_df()$out_inc)), ][[1]]))) +
+      #    ggtitle(paste0(as.character(hospital_plot_df()[which.max(abs(hospital_plot_df()$out_inc)), ][[1]]))) +
       #labs(title= "Outflow Breakdown") +
       theme(
         legend.position = "none",
@@ -461,7 +483,7 @@ server <- function(input, output, session) {
       # ylab("Outflow") +
       coord_flip()
   })
-
-
+  
+  
   
 }

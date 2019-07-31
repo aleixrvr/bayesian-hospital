@@ -45,15 +45,7 @@ i {
 border-color: #ffb600;
 border: 2px solid #ffb600;
 }
-code {
-color: #ffb600;
-background-color: transparent;
-padding: 0px 0px;
-font-size: 80%;
-}
-a:hover {
-color: #ffb600;
-}
+
 .irs-slider {
 top: 19px;
 width: 6px;
@@ -164,9 +156,6 @@ background-color: var(--main-bg-colour);
     color: #444;
 }
 
-
-element.style {
-}
 .box-header .box-title, .box-header>.fa, .box-header>.glyphicon, .box-header>.ion {
     display: inline-block;
     font-size: 30px;
@@ -319,3 +308,23 @@ p {
     content: "\f164";
     color: #969696;
 }
+
+
+.btn-group-vertical>.btn.active, .btn-group-vertical>.btn:active, .btn-group-vertical>.btn:focus, .btn-group-vertical>.btn:hover, .btn-group>.btn.active, .btn-group>.btn:active, .btn-group>.btn:focus {
+    z-index: 2;
+    background-color: #ffb600;
+    color: black;
+    border-color: #222d32;
+}
+
+.btn-default {
+    background-color: #bebebe;
+    border-color: #222d32;
+    color: black;
+    z-index: 2;
+}
+
+
+
+
+

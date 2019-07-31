@@ -33,7 +33,6 @@ ui <- dashboardPage(
       )#,
      # selectize = TRUE
     ),
-    br(),
     sidebarMenu(
       sliderInput(
         width = 400,
@@ -50,13 +49,8 @@ ui <- dashboardPage(
       # numericInput("resource_tsicu", label = h4("TSICU Resources"), value = 26),
       # numericInput("resource_csru", label = h4("CSRU Resources"), value = 25),
       br(),
-      br(),
-      #actionButton("ccu_button", "CCU"),
-      
-      valueBoxOutput("reccomendation",width = 12)
-      
-      #br(),
-
+      infoBoxOutput("reccomendation",width = 12)#,
+    #  infoBoxOutput("economic",width = 12)
       #helpText("Copyright @ 2019 Accenture. All rights reserved.")
      # menuItem(img(src='img/bh_icon.png', width = "290", height = "300", posistion = "center")),
     )

@@ -28,14 +28,14 @@ get_unit_types <- function(){
 }
 
 do_unit <- function(unit_name_sel, resources_sel_inc=1, shift_num_sel=1)
-  {
+{
   
   # median_stats[[1]]$TSICU <- resource_tsicu
   # median_stats[[1]]$CCU <- resource_ccu
   # median_stats[[1]]$MICU <- resource_micu
   # median_stats[[1]]$CSRU <- resource_csru
   # median_stats[[1]]$SICU <- resource_sicu
-
+  
   median_number <- floor(median_stats[[as.character(shift_num_sel)]][[unit_name_sel]])
   resources_sel <- median_number + resources_sel_inc
   results_table %>% 
@@ -57,12 +57,9 @@ do_unit <- function(unit_name_sel, resources_sel_inc=1, shift_num_sel=1)
   
   results <- do_inc[, .(do_unit, out_inc)]
   results[out_inc * sign(resources_sel_inc) <0, out_inc := 0]
+  results <- cbind(results,  do.call(rbind,  median_stats[[shift_num_sel]]))
+  colnames(results)[3] <- "resources"
   return(results) 
 }
-
-
-
-
-
 
 
